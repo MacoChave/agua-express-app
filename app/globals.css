@@ -1,26 +1,255 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
 
+/* ─────────────────────────────────────────────────────────────
+   Design Tokens — Gestión de Purificadora de Agua
+   Sistema de diseño: Hydrology Management (Stitch)
+───────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	/* Primarios */
+	--color-primary: #003657;
+	--color-primary-container: #004d7a;
+	--color-on-primary: #ffffff;
+	--color-on-primary-container: #88bef1;
+	--color-inverse-primary: #96cbff;
+	--color-primary-fixed: #cee5ff;
+	--color-primary-fixed-dim: #96cbff;
+	--color-on-primary-fixed: #001d33;
+	--color-on-primary-fixed-variant: #004a76;
+
+	/* Secundarios */
+	--color-secondary: #00658d;
+	--color-secondary-container: #2dbcfe;
+	--color-on-secondary: #ffffff;
+	--color-on-secondary-container: #004866;
+	--color-secondary-fixed: #c6e7ff;
+	--color-secondary-fixed-dim: #82cfff;
+	--color-on-secondary-fixed: #001e2d;
+	--color-on-secondary-fixed-variant: #004c6b;
+
+	/* Terciarios (neutros oscuros) */
+	--color-tertiary: #303335;
+	--color-tertiary-container: #474a4c;
+	--color-on-tertiary: #ffffff;
+	--color-on-tertiary-container: #b7b9bb;
+	--color-tertiary-fixed: #e0e3e5;
+	--color-tertiary-fixed-dim: #c4c7c9;
+	--color-on-tertiary-fixed: #191c1e;
+	--color-on-tertiary-fixed-variant: #444749;
+
+	/* Superficies */
+	--color-background: #f8f9ff;
+	--color-on-background: #0b1c30;
+	--color-surface: #f8f9ff;
+	--color-surface-dim: #cbdbf5;
+	--color-surface-bright: #f8f9ff;
+	--color-surface-variant: #d3e4fe;
+	--color-surface-tint: #266291;
+	--color-surface-container-lowest: #ffffff;
+	--color-surface-container-low: #eff4ff;
+	--color-surface-container: #e5eeff;
+	--color-surface-container-high: #dce9ff;
+	--color-surface-container-highest: #d3e4fe;
+	--color-on-surface: #0b1c30;
+	--color-on-surface-variant: #41474f;
+	--color-inverse-surface: #213145;
+	--color-inverse-on-surface: #eaf1ff;
+
+	/* Contornos */
+	--color-outline: #717880;
+	--color-outline-variant: #c1c7d0;
+
+	/* Error */
+	--color-error: #ba1a1a;
+	--color-error-container: #ffdad6;
+	--color-on-error: #ffffff;
+	--color-on-error-container: #93000a;
+
+	/* Sombra de elevación (Deep Ocean Blue al 10%) */
+	--shadow-ambient: 0 2px 8px 0 rgba(0, 77, 122, 0.1);
+	--shadow-card: 0 4px 16px 0 rgba(0, 77, 122, 0.12);
+	--shadow-hover: 0 6px 20px 0 rgba(0, 77, 122, 0.18);
+
+	/* Espaciado */
+	--spacing-xs: 4px;
+	--spacing-sm: 8px;
+	--spacing-md: 16px;
+	--spacing-lg: 24px;
+	--spacing-xl: 32px;
+	--spacing-gutter: 24px;
+	--spacing-margin-mobile: 16px;
+	--spacing-margin-desktop: 48px;
+
+	/* Radios */
+	--radius-sm: 0.25rem;
+	--radius: 0.5rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.5rem;
+	--radius-full: 9999px;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Tailwind v4 — @theme (extiende las utilidades CSS)
+───────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	/* Fuente */
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+	/* Colores mapeados a utilidades Tailwind */
+	--color-primary: var(--color-primary);
+	--color-primary-container: var(--color-primary-container);
+	--color-on-primary: var(--color-on-primary);
+	--color-on-primary-container: var(--color-on-primary-container);
+	--color-inverse-primary: var(--color-inverse-primary);
+
+	--color-secondary: var(--color-secondary);
+	--color-secondary-container: var(--color-secondary-container);
+	--color-on-secondary: var(--color-on-secondary);
+	--color-on-secondary-container: var(--color-on-secondary-container);
+
+	--color-tertiary: var(--color-tertiary);
+	--color-tertiary-container: var(--color-tertiary-container);
+	--color-on-tertiary: var(--color-on-tertiary);
+	--color-on-tertiary-container: var(--color-on-tertiary-container);
+
+	--color-background: var(--color-background);
+	--color-on-background: var(--color-on-background);
+	--color-surface: var(--color-surface);
+	--color-surface-dim: var(--color-surface-dim);
+	--color-surface-variant: var(--color-surface-variant);
+	--color-surface-container-lowest: var(--color-surface-container-lowest);
+	--color-surface-container-low: var(--color-surface-container-low);
+	--color-surface-container: var(--color-surface-container);
+	--color-surface-container-high: var(--color-surface-container-high);
+	--color-surface-container-highest: var(--color-surface-container-highest);
+	--color-on-surface: var(--color-on-surface);
+	--color-on-surface-variant: var(--color-on-surface-variant);
+	--color-inverse-surface: var(--color-inverse-surface);
+	--color-inverse-on-surface: var(--color-inverse-on-surface);
+
+	--color-outline: var(--color-outline);
+	--color-outline-variant: var(--color-outline-variant);
+
+	--color-error: var(--color-error);
+	--color-error-container: var(--color-error-container);
+	--color-on-error: var(--color-on-error);
+	--color-on-error-container: var(--color-on-error-container);
+
+	/* Espaciado personalizado */
+	--spacing-xs: var(--spacing-xs);
+	--spacing-sm: var(--spacing-sm);
+	--spacing-md: var(--spacing-md);
+	--spacing-lg: var(--spacing-lg);
+	--spacing-xl: var(--spacing-xl);
+	--spacing-gutter: var(--spacing-gutter);
+	--spacing-margin-mobile: var(--spacing-margin-mobile);
+	--spacing-margin-desktop: var(--spacing-margin-desktop);
+
+	/* Radios personalizados */
+	--radius-sm: var(--radius-sm);
+	--radius: var(--radius);
+	--radius-md: var(--radius-md);
+	--radius-lg: var(--radius-lg);
+	--radius-xl: var(--radius-xl);
+	--radius-full: var(--radius-full);
+
+	/* Tipografía — escalas */
+	--text-headline-xl: 2.5rem; /* 40px */
+	--text-headline-xl--line-height: 3rem; /* 48px */
+	--text-headline-lg: 2rem; /* 32px */
+	--text-headline-lg--line-height: 2.5rem;
+	--text-headline-lg-mobile: 1.75rem; /* 28px */
+	--text-headline-lg-mobile--line-height: 2.25rem;
+	--text-headline-md: 1.5rem; /* 24px */
+	--text-headline-md--line-height: 2rem;
+	--text-headline-sm: 1.25rem; /* 20px */
+	--text-headline-sm--line-height: 1.75rem;
+	--text-body-lg: 1.125rem; /* 18px */
+	--text-body-lg--line-height: 1.75rem;
+	--text-body-md: 1rem; /* 16px */
+	--text-body-md--line-height: 1.5rem;
+	--text-body-sm: 0.875rem; /* 14px */
+	--text-body-sm--line-height: 1.25rem;
+	--text-label-md: 0.75rem; /* 12px */
+	--text-label-md--line-height: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ─────────────────────────────────────────────────────────────
+   Base global
+───────────────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background-color: var(--color-background);
+	color: var(--color-on-background);
+	font-family: var(--font-sans);
+	font-size: 1rem;
+	line-height: 1.5rem;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Clases utilitarias de tipografía
+───────────────────────────────────────────────────────────── */
+.text-headline-xl {
+	font-size: 2.5rem;
+	font-weight: 700;
+	line-height: 3rem;
+	letter-spacing: -0.02em;
+}
+.text-headline-lg {
+	font-size: 2rem;
+	font-weight: 600;
+	line-height: 2.5rem;
+	letter-spacing: -0.01em;
+}
+.text-headline-lg-mobile {
+	font-size: 1.75rem;
+	font-weight: 600;
+	line-height: 2.25rem;
+}
+.text-headline-md {
+	font-size: 1.5rem;
+	font-weight: 600;
+	line-height: 2rem;
+}
+.text-headline-sm {
+	font-size: 1.25rem;
+	font-weight: 600;
+	line-height: 1.75rem;
+}
+.text-body-lg {
+	font-size: 1.125rem;
+	font-weight: 400;
+	line-height: 1.75rem;
+}
+.text-body-md {
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5rem;
+}
+.text-body-sm {
+	font-size: 0.875rem;
+	font-weight: 400;
+	line-height: 1.25rem;
+}
+.text-label-md {
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Sombras de elevación (utilidades)
+───────────────────────────────────────────────────────────── */
+.shadow-ambient {
+	box-shadow: var(--shadow-ambient);
+}
+.shadow-card {
+	box-shadow: var(--shadow-card);
+}
+.shadow-hover {
+	box-shadow: var(--shadow-hover);
 }
