@@ -1,4 +1,4 @@
-type StatusVariant =
+export type StatusVariant =
 	| 'operational'
 	| 'alert'
 	| 'pending'

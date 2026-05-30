@@ -1,0 +1,285 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AquaFlow Manager - Nuevo Registro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#001e2d",
+                    "on-tertiary-container": "#b7b9bb",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#41474f",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#88bef1",
+                    "surface-container-highest": "#d3e4fe",
+                    "primary-container": "#004d7a",
+                    "tertiary-container": "#474a4c",
+                    "outline": "#717880",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "primary-fixed-dim": "#96cbff",
+                    "outline-variant": "#c1c7d0",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "tertiary-fixed": "#e0e3e5",
+                    "surface": "#f8f9ff",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary": "#303335",
+                    "secondary-fixed-dim": "#82cfff",
+                    "on-primary-fixed-variant": "#004a76",
+                    "on-primary-fixed": "#001d33",
+                    "on-tertiary-fixed": "#191c1e",
+                    "inverse-surface": "#213145",
+                    "secondary-container": "#2dbcfe",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#c6e7ff",
+                    "surface-tint": "#266291",
+                    "surface-dim": "#cbdbf5",
+                    "on-background": "#0b1c30",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-container": "#004866",
+                    "inverse-primary": "#96cbff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed": "#cee5ff",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed-variant": "#004c6b",
+                    "secondary": "#00658d",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "background": "#f8f9ff",
+                    "primary": "#003657"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "48px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "base": "8px",
+                    "sm": "8px",
+                    "margin-mobile": "16px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c7d0; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center px-margin-mobile h-16 bg-surface shadow-sm transition-all duration-200">
+<button class="mr-4 p-2 transition-all duration-200 active:scale-95 hover:bg-surface-container-high rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Nuevo Registro</h1>
+<div class="ml-auto flex items-center gap-2">
+<button class="p-2 transition-all duration-200 active:scale-95 hover:bg-surface-container-high rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+</button>
+</div>
+</header>
+<main class="pt-20 px-4 max-w-2xl mx-auto space-y-6">
+<!-- Form Section -->
+<section class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<!-- Equipment Selection Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-4">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+<h2 class="font-headline-sm text-headline-sm text-primary">Identificación</h2>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Equipo / Instalación</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-0 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-secondary-container transition-all text-body-md font-body-md">
+<option>Planta Central - Unidad 04</option>
+<option>Sector Norte - Bomba 12</option>
+<option>Tanque Sedimentación A</option>
+<option>Módulo Osmosis Inversa 02</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Tipo de Mantenimiento</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-0 rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-secondary-container transition-all text-body-md font-body-md">
+<option>Backwash (Retrolavado)</option>
+<option>Filter Change (Cambio de Filtro)</option>
+<option>Water Quality Analysis</option>
+<option>UV Bulb Replacement</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">build</span>
+</div>
+</div>
+</div>
+<!-- Details Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Date & Time Card -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-3">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span> Fecha y Hora
+                    </label>
+<input class="w-full bg-transparent border-0 border-b-2 border-surface-container-high focus:border-secondary-container focus:ring-0 text-body-md font-body-md py-1" id="current-time-picker" type="datetime-local">
+</div>
+<!-- Status Selection -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-3">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">assignment_turned_in</span> Estado
+                    </label>
+<div class="flex gap-2">
+<button class="flex-1 py-2 rounded-lg font-label-md text-label-md transition-all border-2 border-transparent bg-surface-container-high text-on-surface-variant" id="status-completed" onclick="setStatus('Completed')">Completado</button>
+<button class="flex-1 py-2 rounded-lg font-label-md text-label-md transition-all border-2 border-secondary-container bg-secondary-container/10 text-on-secondary-container" id="status-progress" onclick="setStatus('In Progress')">En Progreso</button>
+</div>
+</div>
+</div>
+<!-- Operator Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-4">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Técnico / Operador Responsable</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-0 rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-secondary-container transition-all text-body-md font-body-md" placeholder="Nombre completo" type="text" value="Ing. Ricardo Méndez">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
+</div>
+</div>
+</div>
+<!-- Upload Section -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-primary">Evidencia Fotográfica</h3>
+<span class="font-label-md text-label-md text-on-surface-variant">Máx. 5 MB</span>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer hover:border-secondary-container hover:bg-secondary-container/5 transition-all" id="drop-zone">
+<div class="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-primary">photo_camera</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Subir Comprobante</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Toca para abrir la cámara o arrastra un archivo</p>
+</div>
+</div>
+</div>
+<!-- Observations Section -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] space-y-4">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Observaciones y Notas</label>
+<textarea class="w-full bg-surface-container-low border-0 rounded-xl p-4 focus:ring-2 focus:ring-secondary-container transition-all text-body-md font-body-md" placeholder="Detalle los hallazgos o ajustes realizados durante el mantenimiento..." rows="4"></textarea>
+</div>
+<!-- Submit Button -->
+<div class="pt-4 pb-8">
+<button class="w-full bg-primary text-on-primary font-headline-sm text-headline-sm py-4 rounded-xl shadow-lg hover:bg-primary-container transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">save</span>
+                    Guardar Registro
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,77,122,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 transition-transform duration-200 active:scale-90 hover:text-primary" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md mt-1">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1.5 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">build</span>
+<span class="font-label-md text-label-md mt-1">Maintenance</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 transition-transform duration-200 active:scale-90 hover:text-primary" href="#">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-label-md text-label-md mt-1">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 transition-transform duration-200 active:scale-90 hover:text-primary" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md mt-1">Settings</span>
+</a>
+</nav>
+<script>
+        // Set current time to the datetime-local input
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        document.getElementById('current-time-picker').value = formattedDateTime;
+
+        // Simple state management for status buttons
+        function setStatus(status) {
+            const completedBtn = document.getElementById('status-completed');
+            const progressBtn = document.getElementById('status-progress');
+            
+            if (status === 'Completed') {
+                completedBtn.classList.add('bg-secondary-container/10', 'text-on-secondary-container', 'border-secondary-container');
+                completedBtn.classList.remove('bg-surface-container-high', 'text-on-surface-variant', 'border-transparent');
+                
+                progressBtn.classList.remove('bg-secondary-container/10', 'text-on-secondary-container', 'border-secondary-container');
+                progressBtn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-transparent');
+            } else {
+                progressBtn.classList.add('bg-secondary-container/10', 'text-on-secondary-container', 'border-secondary-container');
+                progressBtn.classList.remove('bg-surface-container-high', 'text-on-surface-variant', 'border-transparent');
+                
+                completedBtn.classList.remove('bg-secondary-container/10', 'text-on-secondary-container', 'border-secondary-container');
+                completedBtn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-transparent');
+            }
+        }
+
+        // Fake drop zone interaction
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('click', () => {
+            alert('En un entorno real, esto abriría el explorador de archivos o la cámara del dispositivo móvil.');
+        });
+    </script>
+</body></html>
