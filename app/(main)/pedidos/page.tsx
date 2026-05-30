@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { Button, Card, InputField, StatusChip } from '../../components/ui';
 import type { StatusVariant } from '../../components/ui/StatusChip';
 
@@ -168,7 +169,9 @@ export default function PedidosPage() {
 							entregas.
 						</p>
 					</div>
-					<Button>+ Añadir Pedido</Button>
+					<Link href='/anadir-pedido'>
+						<Button>+ Añadir Pedido</Button>
+					</Link>
 				</div>
 
 				{/* ── Tarjetas de estadísticas ──────────────── */}
