@@ -1,62 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
-/* ─── Types ─────────────────────────────────────────── */
-interface Transaction {
-	id: number;
-	concept: string;
-	category: string;
-	time: string;
-	amount: number;
-	icon: string;
-}
-
-/* ─── Static data ────────────────────────────────────── */
-const TRANSACTIONS: Transaction[] = [
-	{
-		id: 1,
-		concept: 'Venta de Bidones x20',
-		category: 'Venta Directa',
-		time: '14:25 PM',
-		amount: 120.0,
-		icon: 'water_drop',
-	},
-	{
-		id: 2,
-		concept: 'Repuesto Filtro UV',
-		category: 'Mantenimiento',
-		time: '11:40 AM',
-		amount: -345.0,
-		icon: 'build',
-	},
-	{
-		id: 3,
-		concept: 'Recarga Energía Planta',
-		category: 'Servicios',
-		time: '09:15 AM',
-		amount: -150.25,
-		icon: 'electric_bolt',
-	},
-];
-
-/* Bar chart data: [label, heightPx, active] */
-const BAR_DATA: [string, number, boolean][] = [
-	['ENE', 128, false],
-	['FEB', 160, false],
-	['MAR', 96, false],
-	['ABR', 208, true],
-	['MAY', 144, false],
-	['JUN', 192, false],
-];
-
-function fmt(n: number) {
-	return new Intl.NumberFormat('es-MX', {
-		style: 'currency',
-		currency: 'USD',
-		minimumFractionDigits: 2,
-	}).format(Math.abs(n));
-}
+import { TRANSACTIONS, BAR_DATA } from '@/features/reportes/types';
+import { formatCurrency } from '@/lib/utils';
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function ReportesPage() {
@@ -345,7 +291,7 @@ export default function ReportesPage() {
 													: 'text-[var(--color-error)]'
 											}`}>
 											{tx.amount > 0 ? '+' : '-'}
-											{fmt(tx.amount)}
+											{formatCurrency(tx.amount)}
 										</td>
 									</tr>
 								))}

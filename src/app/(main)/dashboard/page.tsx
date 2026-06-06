@@ -6,8 +6,8 @@ import {
 	DataTable,
 	InputField,
 	StatusChip,
-} from '../../components/ui';
-import type { Column } from '../../components/ui';
+} from '@/components/ui';
+import type { Column } from '@/components/ui';
 
 type Pedido = {
 	id: string;

@@ -2,108 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Button, Card, InputField, StatusChip } from '../../components/ui';
-import type { StatusVariant } from '../../components/ui/StatusChip';
-
-/* ── Tipos ──────────────────────────────────────────────── */
-type EstadoPedido = 'en-camino' | 'entregado' | 'pendiente';
-
-interface Pedido {
-	id: string;
-	cliente: string;
-	iniciales: string;
-	avatarColor: string;
-	botellones: number;
-	total: number;
-	estado: EstadoPedido;
-}
-
-/* ── Datos de ejemplo ───────────────────────────────────── */
-const PEDIDOS_MOCK: Pedido[] = [
-	{
-		id: 'ORD-9902',
-		cliente: 'Juan Rodríguez',
-		iniciales: 'JR',
-		avatarColor: 'var(--color-primary-fixed)',
-		botellones: 12,
-		total: 156,
-		estado: 'en-camino',
-	},
-	{
-		id: 'ORD-9884',
-		cliente: 'María Alarcón',
-		iniciales: 'MA',
-		avatarColor: 'var(--color-secondary-fixed)',
-		botellones: 5,
-		total: 65,
-		estado: 'entregado',
-	},
-	{
-		id: 'ORD-9877',
-		cliente: 'Carlos Pérez',
-		iniciales: 'CP',
-		avatarColor: 'var(--color-tertiary-fixed)',
-		botellones: 20,
-		total: 260,
-		estado: 'en-camino',
-	},
-	{
-		id: 'ORD-9865',
-		cliente: 'Lucía Gómez',
-		iniciales: 'LG',
-		avatarColor: 'var(--color-primary-fixed-dim)',
-		botellones: 8,
-		total: 104,
-		estado: 'entregado',
-	},
-	{
-		id: 'ORD-9851',
-		cliente: 'Andrés Mendoza',
-		iniciales: 'AM',
-		avatarColor: 'var(--color-surface-container-high)',
-		botellones: 3,
-		total: 39,
-		estado: 'pendiente',
-	},
-	{
-		id: 'ORD-9840',
-		cliente: 'Sofía Vargas',
-		iniciales: 'SV',
-		avatarColor: 'var(--color-secondary-container)',
-		botellones: 15,
-		total: 195,
-		estado: 'pendiente',
-	},
-];
-
-/* ── Configuración de estado visual ─────────────────────── */
-const estadoConfig: Record<
-	EstadoPedido,
-	{ label: string; status: StatusVariant; chip: string }
-> = {
-	'en-camino': {
-		label: 'En camino',
-		status: 'info',
-		chip: 'bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)]',
-	},
-	entregado: {
-		label: 'Entregado',
-		status: 'operational',
-		chip: 'bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)]',
-	},
-	pendiente: {
-		label: 'Pendiente',
-		status: 'pending',
-		chip: 'bg-[var(--color-error-container)] text-[var(--color-on-error-container)]',
-	},
-};
-
-const FILTROS: { label: string; value: EstadoPedido | 'todos' }[] = [
-	{ label: 'Todos', value: 'todos' },
-	{ label: 'En camino', value: 'en-camino' },
-	{ label: 'Entregados', value: 'entregado' },
-	{ label: 'Pendientes', value: 'pendiente' },
-];
+import { Button, Card, InputField, StatusChip } from '@/components/ui';
+import type { StatusVariant } from '@/components/ui/StatusChip';
+import {
+	type EstadoPedido,
+	type Pedido,
+	ESTADO_CONFIG,
+	FILTROS_PEDIDO,
+	PEDIDOS_MOCK,
+} from '@/features/pedidos/types';
 
 const PAGE_SIZE = 4;
 
@@ -252,7 +159,7 @@ export default function PedidosPage() {
 							/>
 						</div>
 						<div className='flex flex-wrap gap-2'>
-							{FILTROS.map((f) => (
+							{FILTROS_PEDIDO.map((f) => (
 								<button
 									key={f.value}
 									onClick={() => handleFiltro(f.value)}
@@ -321,7 +228,8 @@ export default function PedidosPage() {
 									</tr>
 								) : (
 									pedidosPagina.map((pedido) => {
-										const cfg = estadoConfig[pedido.estado];
+										const cfg =
+											ESTADO_CONFIG[pedido.estado];
 										return (
 											<tr
 												key={pedido.id}

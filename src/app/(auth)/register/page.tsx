@@ -2,7 +2,7 @@
 
 import type { FormEvent } from 'react';
 import Link from 'next/link';
-import { Button, Card, InputField, StatusChip } from '../components/ui';
+import { Button, Card, InputField, StatusChip } from '@/components/ui';
 
 export default function RegisterPage() {
 	const handleSubmit = (e: FormEvent) => {

@@ -2,61 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-/* ── Tipos ──────────────────────────────────────────────── */
-type TipoServicio = 'recarga' | 'nuevo';
-type EstadoPago = 'pendiente' | 'en-entrega' | 'pagado';
-
-interface Cliente {
-	iniciales: string;
-	nombre: string;
-	direccion: string;
-}
-
-/* ── Constantes ─────────────────────────────────────────── */
-const PRECIO_UNITARIO = 5.5;
-const CARGO_ENTREGA = 2.0;
-
-const CLIENTES_MOCK: Cliente[] = [
-	{
-		iniciales: 'AR',
-		nombre: 'Alejandro Rodríguez',
-		direccion: 'Calle 15 #45-20, Edificio Mirador',
-	},
-	{
-		iniciales: 'JR',
-		nombre: 'Juan Rodríguez',
-		direccion: 'Av. Principal #123',
-	},
-	{
-		iniciales: 'MA',
-		nombre: 'María Alarcón',
-		direccion: 'Carrera 5 #20-10, Apto 301',
-	},
-	{
-		iniciales: 'CP',
-		nombre: 'Carlos Pérez',
-		direccion: 'Calle 30 #8-50',
-	},
-];
-
-const FRANJAS_HORARIAS = [
-	'08:00 - 10:00',
-	'10:00 - 12:00',
-	'14:00 - 16:00',
-	'16:00 - 18:00',
-];
-
-const ESTADOS_PAGO: { value: EstadoPago; label: string }[] = [
-	{ value: 'pendiente', label: 'Pendiente' },
-	{ value: 'en-entrega', label: 'En Entrega' },
-	{ value: 'pagado', label: 'Pagado' },
-];
-
-/* ── Helpers ─────────────────────────────────────────────── */
-function getTodayISO() {
-	return new Date().toISOString().split('T')[0];
-}
+import {
+	type TipoServicio,
+	type EstadoPago,
+	type Cliente,
+	CLIENTES_MOCK,
+	PRECIO_UNITARIO,
+	CARGO_ENTREGA,
+	FRANJAS_HORARIAS,
+	ESTADOS_PAGO,
+} from '@/features/pedidos/types';
+import { todayISO } from '@/lib/utils';
 
 /* ── Componente ─────────────────────────────────────────── */
 export default function AnadirPedidoPage() {
@@ -70,7 +26,7 @@ export default function AnadirPedidoPage() {
 	const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
 	const [cantidad, setCantidad] = useState(3);
 	const [tipoServicio, setTipoServicio] = useState<TipoServicio>('recarga');
-	const [fechaEntrega, setFechaEntrega] = useState(getTodayISO());
+	const [fechaEntrega, setFechaEntrega] = useState(todayISO());
 	const [franjaHoraria, setFranjaHoraria] = useState('10:00 - 12:00');
 	const [estadoPago, setEstadoPago] = useState<EstadoPago>('pendiente');
 	const [confirmado, setConfirmado] = useState(false);

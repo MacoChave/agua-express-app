@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button, Card, CardHeader, StatusChip } from './components/ui';
+import { Button, Card, CardHeader, StatusChip } from '@/components/ui';
 
 /* ── Datos estáticos ─────────────────────────────────────── */
 const features = [
