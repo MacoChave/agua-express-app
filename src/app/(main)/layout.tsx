@@ -1,28 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import Notifications from '@/assets/icons/notifications.svg';
+import Dashboard from '@/assets/icons/dashboard.svg';
+import OrderApprove from '@/assets/icons/order_approve.svg';
+import Build from '@/assets/icons/build.svg';
+import Analitics from '@/assets/icons/analitics.svg';
 
 /* ─── Nav items ─────────────────────────────────────── */
 const NAV_ITEMS = [
 	{
 		href: '/dashboard',
-		icon: 'dashboard',
+		icon: Dashboard,
 		label: 'Dashboard',
 	},
 	{
 		href: '/pedidos',
-		icon: 'receipt_long',
+		icon: OrderApprove,
 		label: 'Pedidos',
 	},
 	{
 		href: '/mantenimientos',
-		icon: 'build',
+		icon: Build,
 		label: 'Mant.',
 	},
 	{
 		href: '/reportes',
-		icon: 'analytics',
+		icon: Analitics,
 		label: 'Reportes',
 	},
 ] as const;
@@ -34,6 +39,17 @@ export default function MainLayout({
 	children: React.ReactNode;
 }) {
 	const pathname = usePathname();
+	const router = useRouter();
+
+	const handleLogout = async () => {
+		try {
+			await fetch('/api/auth/logout', { method: 'POST' });
+			router.push('/login');
+			router.refresh();
+		} catch (error) {
+			console.error('Error logging out:', error);
+		}
+	};
 
 	return (
 		<div
@@ -51,11 +67,6 @@ export default function MainLayout({
 				}}>
 				{/* Brand */}
 				<Link href='/dashboard' className='flex items-center gap-3'>
-					<span
-						className='material-symbols-outlined text-2xl'
-						style={{ color: 'var(--color-primary)' }}>
-						water_drop
-					</span>
 					<span
 						className='text-headline-md font-bold'
 						style={{ color: 'var(--color-primary)' }}>
@@ -81,7 +92,7 @@ export default function MainLayout({
 							).style.backgroundColor = 'transparent')
 						}>
 						<span className='material-symbols-outlined'>
-							notifications
+							<Notifications className='w-6 h-6' />
 						</span>
 						<span
 							className='absolute top-2 right-2 w-2 h-2 rounded-full'
@@ -89,15 +100,23 @@ export default function MainLayout({
 						/>
 					</button>
 
-					<div
-						className='w-10 h-10 rounded-full border-2 flex items-center justify-center text-label-md font-bold overflow-hidden'
+					<Link
+						href='/profile'
+						className='w-10 h-10 rounded-full border-2 flex items-center justify-center text-label-md font-bold overflow-hidden transition-transform active:scale-95'
 						style={{
 							borderColor: 'var(--color-primary-container)',
 							backgroundColor: 'var(--color-surface-container)',
 							color: 'var(--color-primary)',
 						}}>
 						TC
-					</div>
+					</Link>
+
+					<button
+						onClick={handleLogout}
+						className='px-3 py-1.5 rounded-lg text-label-lg font-semibold transition-colors hover:bg-error-container/20 text-[var(--color-error)]'
+					>
+						Salir
+					</button>
 				</div>
 			</header>
 
@@ -113,7 +132,7 @@ export default function MainLayout({
 					backgroundColor: 'var(--color-surface-container-lowest)',
 					boxShadow: '0 -4px 12px rgba(0,77,122,0.08)',
 				}}>
-				{NAV_ITEMS.map(({ href, icon, label }) => {
+				{NAV_ITEMS.map(({ href, icon: Icon, label }) => {
 					const active =
 						pathname === href || pathname.startsWith(href + '/');
 					return (
@@ -125,22 +144,21 @@ export default function MainLayout({
 								active
 									? {
 											backgroundColor:
-												'var(--color-secondary-container)',
-											color: 'var(--color-on-secondary-container)',
+												'var(--color-primary-container)',
+											color: 'var(--color-on-primary-container)',
 										}
 									: {
 											color: 'var(--color-on-surface-variant)',
 										}
 							}>
-							<span
-								className='material-symbols-outlined'
-								style={
+							<Icon
+								className='w-6 h-6 shrink-0'
+								fill={
 									active
-										? { fontVariationSettings: "'FILL' 1" }
-										: {}
-								}>
-								{icon}
-							</span>
+										? 'var(--color-on-primary-container)'
+										: 'var(--color-primary)'
+								}
+							/>
 							<span className='text-label-md mt-0.5'>
 								{label}
 							</span>
@@ -156,7 +174,7 @@ export default function MainLayout({
 					backgroundColor: 'var(--color-surface)',
 					borderColor: 'var(--color-outline-variant)',
 				}}>
-				{NAV_ITEMS.map(({ href, icon, label }) => {
+				{NAV_ITEMS.map(({ href, icon: Icon, label }) => {
 					const active =
 						pathname === href || pathname.startsWith(href + '/');
 					return (
@@ -168,8 +186,8 @@ export default function MainLayout({
 								active
 									? {
 											backgroundColor:
-												'var(--color-secondary-container)',
-											color: 'var(--color-on-secondary-container)',
+												'var(--color-primary-container)',
+											color: 'var(--color-on-primary-container)',
 											fontWeight: 600,
 										}
 									: {
@@ -189,15 +207,14 @@ export default function MainLayout({
 										e.currentTarget as HTMLElement
 									).style.backgroundColor = 'transparent';
 							}}>
-							<span
-								className='material-symbols-outlined shrink-0'
-								style={
+							<Icon
+								className='w-6 h-6 shrink-0'
+								fill={
 									active
-										? { fontVariationSettings: "'FILL' 1" }
-										: {}
-								}>
-								{icon}
-							</span>
+										? 'var(--color-on-primary-container)'
+										: 'var(--color-primary)'
+								}
+							/>
 							<span className='hidden lg:block text-body-md'>
 								{label}
 							</span>

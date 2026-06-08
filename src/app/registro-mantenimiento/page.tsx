@@ -4,6 +4,10 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import ArrowBack from '@/assets/icons/arrow_back.svg';
+import Close from '@/assets/icons/close.svg';
+import AddAPhoto from '@/assets/icons/add_a_photo.svg';
+
 /* ─── Types ─────────────────────────────────────────── */
 type Status = 'completed' | 'in-progress';
 
@@ -83,9 +87,7 @@ export default function RegistroMantenimientoPage() {
 					href='/mantenimientos'
 					className='mr-4 p-2 rounded-full hover:bg-[var(--color-surface-container-high)] transition-colors active:scale-95'
 					aria-label='Volver'>
-					<span className='material-symbols-outlined text-[var(--color-primary)]'>
-						arrow_back
-					</span>
+					<ArrowBack className='w-5 h-5 text-[var(--color-primary)]' />
 				</Link>
 				<h1 className='text-headline-sm font-bold text-[var(--color-primary)]'>
 					Nuevo Registro

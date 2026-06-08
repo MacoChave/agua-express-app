@@ -1,13 +1,76 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 
 export default function RegisterPage() {
-	const handleSubmit = (e: FormEvent) => {
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// TODO: integrar registro de usuario
+		setLoading(true);
+		setError(null);
+
+		const formData = new FormData(e.currentTarget);
+		const firstName = formData.get('firstName');
+		const lastName = formData.get('lastName');
+		const companyName = formData.get('company');
+		const warehouseName = formData.get('warehouseName');
+		const nit = formData.get('nit') || 'CF'; // Default NIT
+		const email = formData.get('email');
+		const password = formData.get('password');
+		const confirmPassword = formData.get('confirmPassword');
+
+		if (password !== confirmPassword) {
+			setError('Las contraseñas no coinciden');
+			setLoading(false);
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email,
+					password,
+					firstName,
+					lastName,
+					companyName,
+					warehouseName: warehouseName
+						? warehouseName
+						: `${companyName} Central`,
+					nit,
+				}),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(
+					data.error || 'Ocurrió un error al crear la cuenta',
+				);
+			}
+
+			// Iniciar sesión automáticamente después del registro
+			await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password }),
+			});
+
+			router.push('/dashboard');
+			router.refresh();
+		} catch (err: any) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -33,7 +96,8 @@ export default function RegisterPage() {
 							href='/'
 							className='text-headline-sm font-semibold'
 							style={{ color: 'var(--color-on-primary)' }}>
-							💧 AguaExpress
+							<WaterDrop className='inline-block w-6 h-6 mr-2' />
+							AguaExpress
 						</Link>
 						<StatusChip
 							status='operational'
@@ -55,6 +119,11 @@ export default function RegisterPage() {
 				</div>
 
 				<div className='px-8 py-8'>
+					{error && (
+						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
+							{error}
+						</div>
+					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 							<InputField
@@ -80,9 +149,27 @@ export default function RegisterPage() {
 								id='company'
 								name='company'
 								type='text'
-								label='Purificadora'
+								label='Empresa'
 								placeholder='Agua Pura del Norte'
 								required
+							/>
+
+							<InputField
+								id='warehouse'
+								name='warehouse'
+								type='text'
+								label='Almacén'
+								placeholder='Almacén Principal'
+								hint='Deja en blanco para usar el nombre por defecto'
+							/>
+
+							<InputField
+								id='nit'
+								name='nit'
+								type='text'
+								label='NIT'
+								placeholder='CF'
+								hint='Deja en blanco si no tienes NIT'
 							/>
 
 							<InputField
@@ -154,8 +241,10 @@ export default function RegisterPage() {
 							</span>
 						</label>
 
-						<Button type='submit' fullWidth>
-							Crear cuenta gratis
+						<Button type='submit' fullWidth loading={loading}>
+							{loading
+								? 'Creando cuenta...'
+								: 'Crear cuenta gratis'}
 						</Button>
 					</form>
 

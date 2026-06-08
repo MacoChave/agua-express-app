@@ -1,5 +1,3 @@
--- Create the agua_express schema
-CREATE SCHEMA IF NOT EXISTS "agua_express";
 
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -7,26 +5,26 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Custom enumerated types
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'agua_express')) THEN
-        CREATE TYPE "agua_express".order_status AS ENUM ('on-the-way', 'delivered', 'pending');
+        CREATE TYPE "public".order_status AS ENUM ('on-the-way', 'delivered', 'pending');
     END IF;
     
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'maintenance_status' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'agua_express')) THEN
-        CREATE TYPE "agua_express".maintenance_status AS ENUM ('completed', 'pending', 'in-progress');
+        CREATE TYPE "public".maintenance_status AS ENUM ('completed', 'pending', 'in-progress');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'agua_express')) THEN
-        CREATE TYPE "agua_express".user_role AS ENUM ('admin', 'operator', 'supervisor');
+        CREATE TYPE "public".user_role AS ENUM ('admin', 'operator', 'supervisor');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'period_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'agua_express')) THEN
-        CREATE TYPE "agua_express".period_type AS ENUM ('daily', 'weekly', 'monthly');
+        CREATE TYPE "public".period_type AS ENUM ('daily', 'weekly', 'monthly');
     END IF;
 END $$;
 
 -- =============================================
 -- COMPANIES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".companies (
+CREATE TABLE IF NOT EXISTS "public".companies (
     id            SERIAL          PRIMARY KEY,
     name          VARCHAR(150)    NOT NULL,
     logo          TEXT,
@@ -39,9 +37,9 @@ CREATE TABLE IF NOT EXISTS "agua_express".companies (
 -- =============================================
 -- WAREHOUSES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".warehouses (
+CREATE TABLE IF NOT EXISTS "public".warehouses (
     id              SERIAL,
-    company_id      INTEGER         NOT NULL REFERENCES "agua_express".companies(id) ON DELETE CASCADE,
+    company_id      INTEGER         NOT NULL REFERENCES "public".companies(id) ON DELETE CASCADE,
     name            VARCHAR(150)    NOT NULL,
     address         VARCHAR(250),
     created_at      TIMESTAMPTZ     DEFAULT NOW(),
@@ -51,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "agua_express".warehouses (
 -- =============================================
 -- MOVEMENT TYPES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".movement_types (
+CREATE TABLE IF NOT EXISTS "public".movement_types (
     move_type           TEXT			not NULL,
     company_id			INTEGER			not null,
     warehouse_id		INTEGER			not null,
@@ -60,13 +58,13 @@ CREATE TABLE IF NOT EXISTS "agua_express".movement_types (
     description         TEXT,
     created_at          TIMESTAMPTZ     DEFAULT NOW(),
     PRIMARY KEY (move_type, company_id, warehouse_id),
-    FOREIGN KEY (company_id, warehouse_id) REFERENCES "agua_express".warehouses(company_id, id) ON DELETE CASCADE
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id) ON DELETE CASCADE
 );
 
 -- =============================================
 -- EXPENSE TYPES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".expense_types (
+CREATE TABLE IF NOT EXISTS "public".expense_types (
     expense_type TEXT NOT NULL,
     company_id	INTEGER NOT NULL,
     warehouse_id INTEGER NOT NULL,
@@ -74,13 +72,13 @@ CREATE TABLE IF NOT EXISTS "agua_express".expense_types (
     description TEXT,
     created_at  TIMESTAMPTZ     DEFAULT NOW(),
     PRIMARY KEY (expense_type, company_id, warehouse_id),
-    FOREIGN KEY (company_id, warehouse_id) REFERENCES "agua_express".warehouses(company_id, id) ON DELETE CASCADE
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id) ON DELETE CASCADE
 );
 
 -- =============================================
 -- EQUIPMENT
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".equipment (
+CREATE TABLE IF NOT EXISTS "public".equipment (
     id          SERIAL,
     company_id  INTEGER     NOT NULL,
     warehouse_id INTEGER    NOT NULL,
@@ -88,13 +86,13 @@ CREATE TABLE IF NOT EXISTS "agua_express".equipment (
     description TEXT,
     created_at  TIMESTAMPTZ  DEFAULT NOW(),
     PRIMARY KEY (id, company_id, warehouse_id),
-    FOREIGN KEY (company_id, warehouse_id) REFERENCES "agua_express".warehouses(company_id, id)
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id)
 );
 
 -- =============================================
 -- MAINTENANCE TYPES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".maintenance_types (
+CREATE TABLE IF NOT EXISTS "public".maintenance_types (
     id           SERIAL,
     company_id   INTEGER      NOT NULL,
     warehouse_id INTEGER      NOT NULL,
@@ -102,13 +100,13 @@ CREATE TABLE IF NOT EXISTS "agua_express".maintenance_types (
     description  TEXT,
     created_at   TIMESTAMPTZ   DEFAULT NOW(),
     PRIMARY KEY (id, company_id, warehouse_id),
-    FOREIGN KEY (company_id, warehouse_id) REFERENCES "agua_express".warehouses(company_id, id)
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id)
 );
 
 -- =============================================
 -- INVENTORY MOVEMENTS
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".inventory_movements (
+CREATE TABLE IF NOT EXISTS "public".inventory_movements (
     company_id          INTEGER         NOT NULL,
     warehouse_id        INTEGER         NOT NULL,
     move_type           TEXT 			NOT NULL,
@@ -121,31 +119,31 @@ CREATE TABLE IF NOT EXISTS "agua_express".inventory_movements (
     notes               TEXT,
     created_at          TIMESTAMPTZ     DEFAULT NOW(),
     PRIMARY KEY (company_id, warehouse_id, move_type, serial_number),
-    FOREIGN KEY (company_id, warehouse_id) REFERENCES "agua_express".warehouses(company_id, id),
-    FOREIGN KEY (company_id, warehouse_id, move_type) REFERENCES "agua_express".movement_types(company_id, warehouse_id, move_type) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (company_id, warehouse_id, expense_type_id) REFERENCES "agua_express".expense_types(company_id, warehouse_id, expense_type) ON UPDATE CASCADE ON DELETE SET NULL
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id),
+    FOREIGN KEY (company_id, warehouse_id, move_type) REFERENCES "public".movement_types(company_id, warehouse_id, move_type) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (company_id, warehouse_id, expense_type_id) REFERENCES "public".expense_types(company_id, warehouse_id, expense_type) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 -- =============================================
 -- EQUIPMENT MAINTENANCE SCHEDULES
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".maintenance_schedules (
+CREATE TABLE IF NOT EXISTS "public".maintenance_schedules (
     company_id           INTEGER                      NOT NULL,
     warehouse_id         INTEGER                      NOT NULL,
     equipment_id         INTEGER                      NOT NULL,
     maintenance_type_id  INTEGER                      NOT NULL,
     frequency            INTEGER                      NOT NULL CHECK (frequency > 0),
-    period_type          "agua_express".period_type   NOT NULL,
+    period_type          "public".period_type   NOT NULL,
     created_at           TIMESTAMPTZ                  DEFAULT NOW(),
     PRIMARY KEY (company_id, warehouse_id, equipment_id, maintenance_type_id),
-    FOREIGN KEY (company_id, warehouse_id, equipment_id) REFERENCES "agua_express".equipment(company_id, warehouse_id, id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (company_id, warehouse_id, maintenance_type_id) REFERENCES "agua_express".maintenance_types(company_id, warehouse_id, id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (company_id, warehouse_id, equipment_id) REFERENCES "public".equipment(company_id, warehouse_id, id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (company_id, warehouse_id, maintenance_type_id) REFERENCES "public".maintenance_types(company_id, warehouse_id, id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- =============================================
 -- MAINTENANCE LOGS
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".maintenance_tasks (
+CREATE TABLE IF NOT EXISTS "public".maintenance_tasks (
     company_id           INTEGER      NOT NULL,
     warehouse_id         INTEGER      NOT NULL,
     equipment_id         INTEGER      NOT NULL,
@@ -156,95 +154,103 @@ CREATE TABLE IF NOT EXISTS "agua_express".maintenance_tasks (
     notes                TEXT,
     created_at           TIMESTAMPTZ   DEFAULT NOW(),
     PRIMARY KEY (company_id, warehouse_id, equipment_id, maintenance_type_id, serial_number),
-    FOREIGN KEY (company_id, warehouse_id, equipment_id, maintenance_type_id) REFERENCES "agua_express".maintenance_schedules(company_id, warehouse_id, equipment_id, maintenance_type_id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (company_id, warehouse_id, equipment_id, maintenance_type_id) REFERENCES "public".maintenance_schedules(company_id, warehouse_id, equipment_id, maintenance_type_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- =============================================
 -- CUSTOMERS & ORDERS
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".customers (
+CREATE TABLE IF NOT EXISTS "public".customers (
     id          UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
-    company_id  INTEGER         NOT NULL REFERENCES "agua_express".companies(id) ON DELETE CASCADE,
+    company_id  INTEGER         NOT NULL REFERENCES "public".companies(id) ON DELETE CASCADE,
     name        TEXT            NOT NULL,
     initials    TEXT,
     address     TEXT,
     created_at  TIMESTAMPTZ     DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "agua_express".orders (
+CREATE TABLE IF NOT EXISTS "public".orders (
     id              TEXT            PRIMARY KEY,
-    company_id      INTEGER         NOT NULL REFERENCES "agua_express".companies(id) ON DELETE CASCADE,
-    customer_id     UUID            REFERENCES "agua_express".customers(id) ON DELETE SET NULL,
+    company_id      INTEGER         NOT NULL REFERENCES "public".companies(id) ON DELETE CASCADE,
+    customer_id     UUID            REFERENCES "public".customers(id) ON DELETE SET NULL,
     bottle_count    INTEGER         NOT NULL DEFAULT 0,
     total           NUMERIC(10, 2)  NOT NULL DEFAULT 0,
-    status          "agua_express".order_status DEFAULT 'pending',
+    status          "public".order_status DEFAULT 'pending',
     created_at      TIMESTAMPTZ     DEFAULT NOW()
 );
 
 -- =============================================
 -- PROFILES (Extending auth.users)
 -- =============================================
-CREATE TABLE IF NOT EXISTS "agua_express".profiles (
+CREATE TABLE IF NOT EXISTS "public".profiles (
     id          UUID            PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    company_id  INTEGER         REFERENCES "agua_express".companies(id) ON DELETE SET NULL,
+    company_id  INTEGER,
+    warehouse_id INTEGER,
     full_name   TEXT,
     email       TEXT,
-    role        "agua_express".user_role DEFAULT 'operator',
+    role        "public".user_role DEFAULT 'operator',
     avatar_url  TEXT,
-    created_at  TIMESTAMPTZ     DEFAULT NOW()
+    created_at  TIMESTAMPTZ     DEFAULT NOW(),
+    FOREIGN KEY (company_id, warehouse_id) REFERENCES "public".warehouses(company_id, id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 -- =============================================
 -- INDEXES
 -- =============================================
-CREATE INDEX idx_warehouses_company             ON "agua_express".warehouses(company_id);
-CREATE INDEX idx_equipment_company_warehouse    ON "agua_express".equipment(company_id, warehouse_id);
-CREATE INDEX idx_inv_movements_company_warehouse ON "agua_express".inventory_movements(company_id, warehouse_id);
-CREATE INDEX idx_inv_movements_date             ON "agua_express".inventory_movements(move_date);
-CREATE INDEX idx_maint_logs_equipment           ON "agua_express".maintenance_tasks(equipment_id);
-CREATE INDEX idx_maint_logs_date                ON "agua_express".maintenance_tasks(date);
-CREATE INDEX idx_maint_schedules_equipment       ON "agua_express".maintenance_schedules(equipment_id);
-CREATE INDEX idx_orders_company                 ON "agua_express".orders(company_id);
-CREATE INDEX idx_customers_company              ON "agua_express".customers(company_id);
+CREATE INDEX idx_warehouses_company             ON "public".warehouses(company_id);
+CREATE INDEX idx_equipment_company_warehouse    ON "public".equipment(company_id, warehouse_id);
+CREATE INDEX idx_inv_movements_company_warehouse ON "public".inventory_movements(company_id, warehouse_id);
+CREATE INDEX idx_inv_movements_date             ON "public".inventory_movements(move_date);
+CREATE INDEX idx_maint_logs_equipment           ON "public".maintenance_tasks(equipment_id);
+CREATE INDEX idx_maint_logs_date                ON "public".maintenance_tasks(date);
+CREATE INDEX idx_maint_schedules_equipment       ON "public".maintenance_schedules(equipment_id);
+CREATE INDEX idx_orders_company                 ON "public".orders(company_id);
+CREATE INDEX idx_customers_company              ON "public".customers(company_id);
 
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)
 -- =============================================
 
 -- Enable RLS for all tables
-ALTER TABLE "agua_express".companies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".warehouses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".movement_types ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".expense_types ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".equipment ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".maintenance_types ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".inventory_movements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".maintenance_schedules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".maintenance_tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".customers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "agua_express".profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".warehouses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".movement_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".expense_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".equipment ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".maintenance_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".inventory_movements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".maintenance_schedules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".maintenance_tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public".profiles ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to get current user's company_id
-CREATE OR REPLACE FUNCTION agua_express.get_my_company_id()
+CREATE OR REPLACE FUNCTION public.get_my_company_id()
 RETURNS INTEGER AS $$
-    SELECT company_id FROM agua_express.profiles WHERE id = auth.uid();
+    SELECT company_id FROM public.profiles WHERE id = auth.uid();
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+
+-- Helper function to get current user's warehouse_id
+CREATE OR REPLACE FUNCTION public.get_my_warehouse_id()
+RETURNS INTEGER AS $$
+    SELECT warehouse_id FROM public.profiles WHERE id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- POLICIES
 
 -- Companies: Users can only see their own company
-CREATE POLICY "Users can view their own company" ON "agua_express".companies
-    FOR SELECT USING (id = agua_express.get_my_company_id());
+CREATE POLICY "Users can view their own company" ON "public".companies
+    FOR SELECT USING (id = public.get_my_company_id());
 
 -- Profiles: Users can view their own profile, and admins can view all profiles in their company
-CREATE POLICY "Users can view their own profile" ON "agua_express".profiles
+CREATE POLICY "Users can view their own profile" ON "public".profiles
     FOR SELECT USING (id = auth.uid());
 
-CREATE POLICY "Admins can view company profiles" ON "agua_express".profiles
-    FOR SELECT USING (company_id = agua_express.get_my_company_id() AND (SELECT role FROM agua_express.profiles WHERE id = auth.uid()) = 'admin');
+CREATE POLICY "Admins can view company profiles" ON "public".profiles
+    FOR SELECT USING (company_id = public.get_my_company_id() AND (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
 
--- General rule for multi-tenant tables: Access restricted by company_id
+-- General rule for multi-tenant tables: Access restricted by company_id and warehouse_id
 DO $$ 
 DECLARE 
     t TEXT;
@@ -252,17 +258,17 @@ BEGIN
     FOR t IN 
         SELECT table_name 
         FROM information_schema.columns 
-        WHERE table_schema = 'agua_express' 
+        WHERE table_schema = 'public' 
         AND column_name = 'company_id' 
         AND table_name NOT IN ('companies', 'profiles')
     LOOP
-        EXECUTE format('CREATE POLICY "Company access for %I" ON "agua_express".%I FOR ALL USING (company_id = agua_express.get_my_company_id())', t, t);
+        EXECUTE format('CREATE POLICY "Company access for %I" ON "public".%I FOR ALL USING (company_id = public.get_my_company_id())', t, t);
     END LOOP;
 END $$;
 
 -- Global tables (types) are viewable by all authenticated users but editable only by admins
-CREATE POLICY "Authenticated users can view movement types" ON "agua_express".movement_types FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can view expense types" ON "agua_express".expense_types FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can view movement types" ON "public".movement_types FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated users can view expense types" ON "public".expense_types FOR SELECT USING (auth.role() = 'authenticated');
 
--- Note: In Supabase, remember to add "agua_express" to the search path:
+-- Note: In Supabase, remember to add "public" to the search path:
 -- ALTER DATABASE postgres SET search_path TO "$user", public, agua_express;

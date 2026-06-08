@@ -1,13 +1,44 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 
 export default function LoginPage() {
-	const handleSubmit = (e: FormEvent) => {
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// TODO: integrar autenticación
+		setLoading(true);
+		setError(null);
+
+		const formData = new FormData(e.currentTarget);
+		const email = formData.get('email');
+		const password = formData.get('password');
+
+		try {
+			const res = await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password }),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.error || 'Ocurrió un error al iniciar sesión');
+			}
+
+			router.push('/dashboard');
+			router.refresh();
+		} catch (err: any) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -55,6 +86,11 @@ export default function LoginPage() {
 				</div>
 
 				<div className='px-8 py-8'>
+					{error && (
+						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
+							{error}
+						</div>
+					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<InputField
 							id='email'
@@ -113,8 +149,8 @@ export default function LoginPage() {
 							</span>
 						</label>
 
-						<Button type='submit' fullWidth>
-							Iniciar sesión
+						<Button type='submit' fullWidth loading={loading}>
+							{loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
 						</Button>
 					</form>
 

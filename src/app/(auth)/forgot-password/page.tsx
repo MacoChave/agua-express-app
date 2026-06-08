@@ -1,13 +1,42 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 
 export default function ForgotPasswordPage() {
-	const handleSubmit = (e: FormEvent) => {
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState(false);
+
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// TODO: integrar recuperación de contraseña
+		setLoading(true);
+		setError(null);
+		setSuccess(false);
+
+		const formData = new FormData(e.currentTarget);
+		const email = formData.get('email');
+
+		try {
+			const res = await fetch('/api/auth/forgot-password', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email }),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.error || 'Error al enviar el correo');
+			}
+
+			setSuccess(true);
+		} catch (err: any) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -55,6 +84,16 @@ export default function ForgotPasswordPage() {
 				</div>
 
 				<div className='px-8 py-8'>
+					{error && (
+						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
+							{error}
+						</div>
+					)}
+					{success && (
+						<div className='mb-6 p-4 rounded-lg bg-primary-container text-on-primary-container text-body-sm'>
+							Se ha enviado un enlace de recuperación a tu correo electrónico.
+						</div>
+					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<InputField
 							id='email'
@@ -67,8 +106,8 @@ export default function ForgotPasswordPage() {
 							required
 						/>
 
-						<Button type='submit' fullWidth>
-							Enviar enlace de recuperación
+						<Button type='submit' fullWidth loading={loading}>
+							{loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
 						</Button>
 					</form>
 

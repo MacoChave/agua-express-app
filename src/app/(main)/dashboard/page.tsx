@@ -8,6 +8,14 @@ import {
 	StatusChip,
 } from '@/components/ui';
 import type { Column } from '@/components/ui';
+import OrderApprove from '@/assets/icons/order_approve.svg';
+import Build from '@/assets/icons/build.svg';
+import Event from '@/assets/icons/event.svg';
+import Download from '@/assets/icons/download.svg';
+import AccountBalanceWallet from '@/assets/icons/account_balance_wallet.svg';
+import TrendingUp from '@/assets/icons/trending_up.svg';
+import WaterDrop from '@/assets/icons/water_drop.svg';
+import Search from '@/assets/icons/search.svg';
 
 type Pedido = {
 	id: string;
@@ -126,8 +134,16 @@ export default function DashboardPage() {
 						</p>
 					</div>
 					<div className='flex flex-wrap gap-3'>
-						<Button className='rounded-xl'>Nuevo Pedido</Button>
+						<Button className='rounded-xl'>
+							<span>
+								<OrderApprove className='w-5 h-5' />
+							</span>
+							Nuevo Pedido
+						</Button>
 						<Button variant='secondary' className='rounded-xl'>
+							<span>
+								<Build className='w-5 h-5' />
+							</span>
 							Registrar Mantenimiento
 						</Button>
 					</div>
@@ -148,7 +164,7 @@ export default function DashboardPage() {
 								</h2>
 							</div>
 							<div className='p-2 bg-secondary-container/20 rounded-lg text-secondary'>
-								💳
+								<AccountBalanceWallet className='w-6 h-6' />
 							</div>
 						</div>
 						<div className='flex items-end justify-between'>
@@ -157,7 +173,10 @@ export default function DashboardPage() {
 									$12,450.00
 								</span>
 								<div className='flex items-center gap-1 text-green-600 text-label-md'>
-									↗ +12.5% vs ayer
+									<span>
+										<TrendingUp className='w-5 h-5' />
+									</span>{' '}
+									+12.5% vs ayer
 								</div>
 							</div>
 							<div className='h-16 w-32 flex items-end gap-1'>
@@ -172,46 +191,9 @@ export default function DashboardPage() {
 					<Card
 						variant='default'
 						padding='lg'
-						className='border border-surface-container'>
-						<div>
-							<span className='text-label-md text-on-surface-variant block mb-1'>
-								POR ENTREGAR
-							</span>
-							<h2 className='text-headline-md text-primary'>
-								Pedidos
-							</h2>
-						</div>
-						<div className='mt-8 flex items-center justify-between'>
-							<span className='text-headline-xl text-primary'>
-								24
-							</span>
-							<div className='flex -space-x-2'>
-								<div className='w-8 h-8 rounded-full border-2 border-surface bg-surface-dim grid place-items-center text-label-md'>
-									JS
-								</div>
-								<div className='w-8 h-8 rounded-full border-2 border-surface bg-primary-fixed grid place-items-center text-label-md text-on-primary-fixed'>
-									MR
-								</div>
-								<div className='w-8 h-8 rounded-full border-2 border-surface bg-secondary-fixed grid place-items-center text-label-md text-on-secondary-fixed'>
-									+22
-								</div>
-							</div>
-						</div>
-						<div className='mt-6 pt-4 border-t border-surface-container'>
-							<a
-								className='text-secondary text-label-md hover:underline'
-								href='#'>
-								Ver hoja de ruta →
-							</a>
-						</div>
-					</Card>
-
-					<Card
-						variant='default'
-						padding='lg'
 						className='bg-primary text-on-primary border-0 relative overflow-hidden'>
 						<div className='absolute -right-4 -top-4 opacity-10 text-[120px]'>
-							💧
+							<WaterDrop className='w-32 h-32' />
 						</div>
 						<div className='relative z-10'>
 							<span className='text-label-md opacity-80 block mb-1 uppercase tracking-wider'>
@@ -223,7 +205,10 @@ export default function DashboardPage() {
 						</div>
 						<div className='mt-8 relative z-10'>
 							<div className='flex items-center gap-2 mb-4 text-body-md'>
-								📅 Mañana, 09:00 AM
+								<span>
+									<Event className='w-5 h-5' />
+								</span>{' '}
+								Mañana, 09:00 AM
 							</div>
 							<span className='inline-block px-4 py-1 bg-error text-on-error rounded-full text-label-md animate-pulse'>
 								ALERTA CRÍTICA
@@ -248,7 +233,7 @@ export default function DashboardPage() {
 									/>
 								</div>
 								<button className='p-2 hover:bg-surface-container rounded transition-colors'>
-									⚙️
+									<Search />
 								</button>
 							</div>
 						</div>
@@ -294,11 +279,11 @@ export default function DashboardPage() {
 								Descarga el reporte semanal de purificación.
 							</p>
 							<Button variant='secondary' fullWidth>
+								<span className='text-primary'>
+									<Download className='w-5 h-5 mr-2' />
+								</span>
 								Generar PDF
 							</Button>
-							<span className='absolute -right-4 -bottom-4 text-[80px] text-primary/10'>
-								📈
-							</span>
 						</Card>
 					</div>
 				</div>

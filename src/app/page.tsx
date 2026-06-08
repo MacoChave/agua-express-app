@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button, Card, CardHeader, StatusChip } from '@/components/ui';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 
 /* ── Datos estáticos ─────────────────────────────────────── */
 const features = [
@@ -28,7 +29,7 @@ const features = [
 const plans = [
 	{
 		name: 'Gratis',
-		price: '$0',
+		price: 'Q0',
 		period: '',
 		highlight: false,
 		badge: null,
@@ -40,7 +41,7 @@ const plans = [
 	},
 	{
 		name: 'Profesional',
-		price: '$699',
+		price: 'Q699',
 		period: '/mes',
 		highlight: true,
 		badge: 'Más popular',
@@ -54,7 +55,7 @@ const plans = [
 	},
 	{
 		name: 'Básico',
-		price: '$299',
+		price: 'Q299',
 		period: '/mes',
 		highlight: false,
 		badge: null,
@@ -111,7 +112,8 @@ export default function HomePage() {
 					<span
 						className='text-headline-sm font-bold tracking-tight'
 						style={{ color: 'var(--color-primary)' }}>
-						💧 AguaExpress
+						<WaterDrop className='inline-block w-6 h-6 mr-2' />
+						AguaExpress
 					</span>
 					<nav className='hidden md:flex items-center gap-8 text-body-sm font-medium'>
 						{[
@@ -457,7 +459,8 @@ export default function HomePage() {
 							style={{
 								color: 'var(--color-inverse-on-surface)',
 							}}>
-							💧 AguaExpress
+							<WaterDrop className='inline-block w-6 h-6 mr-2' />
+							AguaExpress
 						</span>
 						<p
 							className='text-body-sm'
@@ -475,19 +478,11 @@ export default function HomePage() {
 						<p
 							className='text-body-md font-medium'
 							style={{ color: 'var(--color-inverse-primary)' }}>
-							totto
+							Maco Chave
 						</p>
 						<div className='flex gap-4 mt-2'>
 							<a
-								href='mailto:totto@dev.com'
-								className='text-body-sm transition-opacity hover:opacity-70'
-								style={{
-									color: 'var(--color-primary-fixed-dim)',
-								}}>
-								✉ totto@dev.com
-							</a>
-							<a
-								href='https://github.com/totto'
+								href='https://github.com/macochave'
 								target='_blank'
 								rel='noopener noreferrer'
 								className='text-body-sm transition-opacity hover:opacity-70'

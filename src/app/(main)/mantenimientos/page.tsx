@@ -1,11 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { type TaskStatus, TASKS } from '@/features/mantenimientos/types';
+import { TASKS } from '@/features/mantenimientos/types';
 import {
 	StatusBadge,
 	NewMaintenanceModal,
 } from '@/features/mantenimientos/components';
+
+import Notifications from '@/assets/icons/notifications.svg';
+import CheckCircle from '@/assets/icons/check_circle.svg';
+import ArrowForward from '@/assets/icons/arrow_forward.svg';
+import AddCircle from '@/assets/icons/add_circle.svg';
+import MoreVert from '@/assets/icons/more_vert.svg';
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function MantenimientosPage() {
@@ -16,18 +22,13 @@ export default function MantenimientosPage() {
 			{/* ── Top App Bar ──────────────────────────────── */}
 			<header className='fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-12 h-16 bg-[var(--color-surface)] border-b border-[var(--color-outline-variant)]'>
 				<div className='flex items-center gap-3'>
-					<span className='material-symbols-outlined text-[var(--color-primary)] text-2xl'>
-						water_drop
-					</span>
 					<h1 className='text-headline-md font-bold text-[var(--color-primary)]'>
 						AquaFlow Manager
 					</h1>
 				</div>
 				<div className='flex items-center gap-4'>
 					<button className='p-2 rounded-full hover:bg-[var(--color-surface-container)] transition-colors relative'>
-						<span className='material-symbols-outlined text-[var(--color-on-surface-variant)]'>
-							notifications
-						</span>
+						<Notifications className='w-6 h-6 text-[var(--color-primary)]' />
 						<span className='absolute top-2 right-2 w-2 h-2 bg-[var(--color-error)] rounded-full' />
 					</button>
 					<div className='w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--color-primary-container)] bg-[var(--color-surface-container)] flex items-center justify-center'>
@@ -61,13 +62,7 @@ export default function MantenimientosPage() {
 									Estado del Sistema
 								</span>
 								<span className='bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1'>
-									<span
-										className='material-symbols-outlined text-sm'
-										style={{
-											fontVariationSettings: "'FILL' 1",
-										}}>
-										check_circle
-									</span>
+									<CheckCircle className='w-4 h-4' />
 									ÓPTIMO
 								</span>
 							</div>
@@ -111,9 +106,7 @@ export default function MantenimientosPage() {
 						<button
 							onClick={() => setModalOpen(true)}
 							className='w-full bg-[var(--color-primary)] text-[var(--color-on-primary)] p-6 rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-lg group'>
-							<span className='material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform'>
-								add_circle
-							</span>
+							<AddCircle />
 							<span className='text-headline-sm font-semibold'>
 								Registrar Nuevo Mantenimiento
 							</span>
@@ -130,9 +123,7 @@ export default function MantenimientosPage() {
 								</h3>
 								<button className='text-[var(--color-primary)] text-label-md font-medium flex items-center gap-1 hover:underline'>
 									Ver historial completo
-									<span className='material-symbols-outlined text-base'>
-										arrow_forward
-									</span>
+									<ArrowForward className='w-4 h-4' />
 								</button>
 							</div>
 
@@ -144,12 +135,6 @@ export default function MantenimientosPage() {
 										className='p-6 hover:bg-[var(--color-surface-container-low)] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4'>
 										{/* Left: icon + info */}
 										<div className='flex gap-4'>
-											<div
-												className={`w-12 h-12 ${task.iconBg} rounded-lg flex items-center justify-center ${task.iconColor} shrink-0`}>
-												<span className='material-symbols-outlined'>
-													{task.icon}
-												</span>
-											</div>
 											<div>
 												<h4 className='text-body-lg font-bold text-[var(--color-on-surface)]'>
 													{task.title}
@@ -189,9 +174,7 @@ export default function MantenimientosPage() {
 												/>
 											</div>
 											<button className='p-2 hover:bg-[var(--color-surface-variant)] rounded-full transition-all'>
-												<span className='material-symbols-outlined text-[var(--color-on-surface-variant)]'>
-													more_vert
-												</span>
+												<MoreVert className='w-5 h-5 text-[var(--color-on-surface-variant)]' />
 											</button>
 										</div>
 									</div>

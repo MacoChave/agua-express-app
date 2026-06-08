@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import type { Priority, TaskStatus } from '@/features/mantenimientos/types';
 
+import Close from '@/assets/icons/close.svg';
+import AddAPhoto from '@/assets/icons/add_a_photo.svg';
+
 /* ── StatusBadge ─────────────────────────────────────────── */
 export function StatusBadge({ status }: { status: TaskStatus }) {
 	const map: Record<TaskStatus, { label: string; cls: string }> = {
@@ -35,7 +38,7 @@ export function NewMaintenanceModal({
 	open,
 	onClose,
 }: NewMaintenanceModalProps) {
-	const [priority, setPriority] = useState<Priority>('alta');
+	const [equipment, setEquipment] = useState('Purificadora');
 	const [taskType, setTaskType] = useState('Retro-lavado');
 	const [notes, setNotes] = useState('');
 	const [submitting, setSubmitting] = useState(false);
@@ -73,17 +76,32 @@ export function NewMaintenanceModal({
 						onClick={onClose}
 						className='p-2 hover:bg-white/10 rounded-full transition-colors'
 						aria-label='Cerrar'>
-						<span className='material-symbols-outlined'>close</span>
+						<Close className='w-5 h-5' />
 					</button>
 				</div>
 
 				{/* Form */}
 				<form className='p-6 space-y-6' onSubmit={handleSubmit}>
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-						{/* Tipo de Tarea */}
+						{/* Equipo */}
 						<div className='space-y-1'>
 							<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-								Tipo de Tarea
+								Equipo
+							</label>
+							<select
+								className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)]'
+								value={equipment}
+								onChange={(e) => setEquipment(e.target.value)}>
+								<option>Purificadora</option>
+								<option>Cisterna</option>
+								<option>Vehiculo</option>
+							</select>
+						</div>
+
+						{/* Tipo de Mantenimiento */}
+						<div className='space-y-1'>
+							<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+								Tipo de Mantenimiento
 							</label>
 							<select
 								className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)]'
@@ -95,28 +113,18 @@ export function NewMaintenanceModal({
 								<option>Calibración de Sensores</option>
 							</select>
 						</div>
+					</div>
 
-						{/* Prioridad */}
-						<div className='space-y-1'>
-							<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-								Prioridad
-							</label>
-							<div className='flex gap-2'>
-								{(['baja', 'alta'] as Priority[]).map((p) => (
-									<button
-										key={p}
-										type='button'
-										onClick={() => setPriority(p)}
-										className={`flex-1 py-2 rounded-xl text-label-md font-bold uppercase transition-all ${
-											priority === p
-												? 'border-2 border-[var(--color-primary)] bg-[var(--color-primary-fixed)] text-[var(--color-on-primary-fixed)]'
-												: 'border border-[var(--color-outline-variant)] hover:bg-[var(--color-surface-container)] text-[var(--color-on-surface)]'
-										}`}>
-										{p}
-									</button>
-								))}
-							</div>
-						</div>
+					{/* Fecha y Hora */}
+					<div className='space-y-1'>
+						<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+							Fecha y Hora
+						</label>
+						<input
+							type='datetime-local'
+							className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)]'
+							defaultValue={new Date().toISOString().slice(0, 16)}
+						/>
 					</div>
 
 					{/* Observaciones */}
@@ -139,9 +147,7 @@ export function NewMaintenanceModal({
 							Evidencia Fotográfica
 						</label>
 						<div className='border-2 border-dashed border-[var(--color-outline-variant)] rounded-xl p-8 flex flex-col items-center justify-center hover:bg-[var(--color-surface-container)] transition-colors cursor-pointer group'>
-							<span className='material-symbols-outlined text-5xl text-[var(--color-outline-variant)] group-hover:text-[var(--color-primary)] mb-2 transition-colors'>
-								add_a_photo
-							</span>
+							<AddAPhoto className='w-8 h-8 text-[var(--color-outline-variant)] mb-2' />
 							<p className='text-body-md text-[var(--color-on-surface-variant)]'>
 								Subir imagen de prueba
 							</p>

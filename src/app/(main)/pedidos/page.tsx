@@ -3,14 +3,16 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
-import type { StatusVariant } from '@/components/ui/StatusChip';
 import {
 	type EstadoPedido,
-	type Pedido,
 	ESTADO_CONFIG,
 	FILTROS_PEDIDO,
 	PEDIDOS_MOCK,
 } from '@/features/pedidos/types';
+import Add from '@/assets/icons/add.svg';
+import WaterDrop from '@/assets/icons/water_drop.svg';
+import ArrowLeft from '@/assets/icons/arrow_left.svg';
+import ArrowRight from '@/assets/icons/arrow_right.svg';
 
 const PAGE_SIZE = 4;
 
@@ -40,10 +42,11 @@ export default function PedidosPage() {
 	);
 
 	const stats = {
-		total: PEDIDOS_MOCK.length,
-		enCamino: PEDIDOS_MOCK.filter((p) => p.estado === 'en-camino').length,
-		entregados: PEDIDOS_MOCK.filter((p) => p.estado === 'entregado').length,
-		pendientes: PEDIDOS_MOCK.filter((p) => p.estado === 'pendiente').length,
+		totalSales: PEDIDOS_MOCK.length,
+		totalShipping: PEDIDOS_MOCK.filter((p) => p.estado === 'en-camino')
+			.length,
+		totalBuys: PEDIDOS_MOCK.filter((p) => p.estado === 'entregado').length,
+		balance: PEDIDOS_MOCK.filter((p) => p.estado === 'pendiente').length,
 	};
 
 	const handleFiltro = (valor: EstadoPedido | 'todos') => {
@@ -77,7 +80,10 @@ export default function PedidosPage() {
 						</p>
 					</div>
 					<Link href='/anadir-pedido'>
-						<Button>+ Añadir Pedido</Button>
+						<Button>
+							<Add className='w-4 h-4 mr-2' /> Añadir Venta /
+							Gasto
+						</Button>
 					</Link>
 				</div>
 
@@ -85,23 +91,23 @@ export default function PedidosPage() {
 				<div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
 					{[
 						{
-							label: 'Total Hoy',
-							value: stats.total,
+							label: 'Ventas totales (Unidades)',
+							value: stats.totalSales,
 							color: 'var(--color-primary)',
 						},
 						{
-							label: 'En camino',
-							value: stats.enCamino,
+							label: 'Ingresos totales (Q)',
+							value: stats.totalShipping,
 							color: 'var(--color-secondary)',
 						},
 						{
-							label: 'Entregados',
-							value: stats.entregados,
+							label: 'Gastos registrados (Q)',
+							value: stats.totalBuys,
 							color: 'var(--color-on-primary-container)',
 						},
 						{
-							label: 'Pendientes',
-							value: stats.pendientes,
+							label: 'Balance neto',
+							value: stats.balance,
 							color: 'var(--color-error)',
 						},
 					].map(({ label, value, color }) => (
@@ -142,48 +148,6 @@ export default function PedidosPage() {
 					variant='default'
 					padding='none'
 					className='overflow-hidden'>
-					{/* Toolbar: búsqueda + filtros */}
-					<div
-						className='px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b'
-						style={{ borderColor: 'var(--color-outline-variant)' }}>
-						<div className='w-full sm:max-w-xs'>
-							<InputField
-								name='busqueda'
-								placeholder='Buscar cliente o ID...'
-								value={busqueda}
-								onChange={(e) =>
-									handleBusqueda(
-										(e.target as HTMLInputElement).value,
-									)
-								}
-							/>
-						</div>
-						<div className='flex flex-wrap gap-2'>
-							{FILTROS_PEDIDO.map((f) => (
-								<button
-									key={f.value}
-									onClick={() => handleFiltro(f.value)}
-									className='px-3 py-1.5 rounded-full text-label-md border transition-colors'
-									style={{
-										backgroundColor:
-											filtroEstado === f.value
-												? 'var(--color-primary)'
-												: 'transparent',
-										color:
-											filtroEstado === f.value
-												? 'var(--color-on-primary)'
-												: 'var(--color-on-surface-variant)',
-										borderColor:
-											filtroEstado === f.value
-												? 'var(--color-primary)'
-												: 'var(--color-outline-variant)',
-									}}>
-									{f.label}
-								</button>
-							))}
-						</div>
-					</div>
-
 					{/* Tabla */}
 					<div className='overflow-x-auto'>
 						<table className='w-full text-left border-collapse'>
@@ -284,12 +248,7 @@ export default function PedidosPage() {
 												{/* Botellones */}
 												<td className='px-6 py-4'>
 													<div className='flex items-center gap-1 text-body-md'>
-														<span
-															style={{
-																color: 'var(--color-secondary)',
-															}}>
-															💧
-														</span>
+														<WaterDrop className='w-4 h-4 text-primary' />
 														<span>
 															{pedido.botellones}{' '}
 															Unidades
@@ -306,8 +265,10 @@ export default function PedidosPage() {
 														}}>
 														$
 														{pedido.total.toLocaleString(
-															'es-MX',
+															'es-GT',
 															{
+																style: 'currency',
+																currency: 'GTQ',
 																minimumFractionDigits: 2,
 															},
 														)}
@@ -380,7 +341,7 @@ export default function PedidosPage() {
 									borderColor: 'var(--color-outline-variant)',
 									color: 'var(--color-on-surface-variant)',
 								}}>
-								‹
+								<ArrowLeft className='w-3 h-3' />
 							</button>
 
 							{Array.from(
@@ -422,7 +383,7 @@ export default function PedidosPage() {
 									borderColor: 'var(--color-outline-variant)',
 									color: 'var(--color-on-surface-variant)',
 								}}>
-								›
+								<ArrowRight className='w-3 h-3' />
 							</button>
 						</div>
 					</div>
