@@ -83,7 +83,7 @@ export default function RegisterPage() {
 			<Card
 				variant='default'
 				padding='none'
-				className='w-full max-w-9/12 rounded-lg overflow-hidden'>
+				className='w-full md:max-w-6/12 rounded-lg overflow-hidden'>
 				<div
 					className='px-8 py-8 border-b'
 					style={{
@@ -97,7 +97,7 @@ export default function RegisterPage() {
 							className='text-headline-sm font-semibold'
 							style={{ color: 'var(--color-on-primary)' }}>
 							<WaterDrop className='inline-block w-6 h-6 mr-2' />
-							AguaExpress
+							AquaFlow Manager
 						</Link>
 						<StatusChip
 							status='operational'
