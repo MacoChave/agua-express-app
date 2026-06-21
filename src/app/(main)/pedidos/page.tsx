@@ -109,13 +109,13 @@ export default function PedidosPage() {
 							label: 'Balance neto',
 							value: stats.balance,
 							isCurrency: true,
-							color: stats.balance >= 0 ? 'var(--color-primary)' : 'var(--color-error)',
+							color:
+								stats.balance >= 0
+									? 'var(--color-primary)'
+									: 'var(--color-error)',
 						},
 					].map(({ label, value, color, isCurrency }) => (
-						<Card
-							key={label}
-							variant='outlined'
-							padding='md'>
+						<Card key={label} variant='outlined' padding='md'>
 							<p
 								className='text-label-md'
 								style={{
@@ -127,8 +127,12 @@ export default function PedidosPage() {
 								className='text-headline-sm mt-1'
 								style={{ color }}>
 								{isCurrency ? (
-									<span className="font-bold">
-										${value.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
+									<span className='font-bold'>
+										{value.toLocaleString('es-GT', {
+											style: 'currency',
+											currency: 'GTQ',
+											minimumFractionDigits: 2,
+										})}
 									</span>
 								) : (
 									String(value)
@@ -196,10 +200,13 @@ export default function PedidosPage() {
 									</tr>
 								) : (
 									paginatedMovements.map((move, i) => {
-										const isExpense = move.move_type === 'COMPRA';
-										const detailText = isExpense 
-											? (move.expense_type_id ? `Gasto: ${move.expense_type_id}` : 'Gasto General') 
-											: (move.notes || 'Venta de producto');
+										const isExpense =
+											move.move_type === 'COMPRA';
+										const detailText = isExpense
+											? move.expense_type_id
+												? `Gasto: ${move.expense_type_id}`
+												: 'Gasto General'
+											: move.notes || 'Venta de producto';
 
 										return (
 											<tr
@@ -210,29 +217,41 @@ export default function PedidosPage() {
 														'var(--color-outline-variant)',
 												}}
 												onMouseEnter={(e) => {
-													(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
+													(
+														e.currentTarget as HTMLTableRowElement
+													).style.backgroundColor =
 														'var(--color-surface-bright)';
 												}}
 												onMouseLeave={(e) => {
-													(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
+													(
+														e.currentTarget as HTMLTableRowElement
+													).style.backgroundColor =
 														'transparent';
 												}}>
-												
 												{/* Fecha */}
 												<td className='px-6 py-4'>
 													<span className='text-body-md font-medium'>
-														{new Date(move.move_date).toLocaleDateString('es-GT', {
-															day: '2-digit',
-															month: 'short',
-															year: 'numeric'
-														})}
+														{new Date(
+															move.move_date,
+														).toLocaleDateString(
+															'es-GT',
+															{
+																day: '2-digit',
+																month: 'short',
+																year: 'numeric',
+															},
+														)}
 													</span>
 												</td>
 
 												{/* Tipo */}
 												<td className='px-6 py-4'>
 													<StatusChip
-														status={isExpense ? 'alert' : 'operational'}
+														status={
+															isExpense
+																? 'alert'
+																: 'operational'
+														}
 														label={move.move_type}
 													/>
 												</td>
@@ -245,7 +264,10 @@ export default function PedidosPage() {
 												{/* Cantidad */}
 												<td className='px-6 py-4'>
 													<span className='text-body-md font-medium'>
-														{move.quantity} {isExpense ? 'und.' : 'botellones'}
+														{move.quantity}{' '}
+														{isExpense
+															? 'und.'
+															: 'botellones'}
 													</span>
 												</td>
 
@@ -254,12 +276,21 @@ export default function PedidosPage() {
 													<span
 														className='text-body-md font-bold'
 														style={{
-															color: isExpense ? 'var(--color-error)' : 'var(--color-primary)',
+															color: isExpense
+																? 'var(--color-error)'
+																: 'var(--color-primary)',
 														}}>
-														{isExpense ? '-' : '+'}$
-														{Number(move.price).toLocaleString('es-GT', {
-															minimumFractionDigits: 2,
-														})}
+														{isExpense ? '-' : '+'}
+														{Number(
+															move.price,
+														).toLocaleString(
+															'es-GT',
+															{
+																style: 'currency',
+																currency: 'GTQ',
+																minimumFractionDigits: 2,
+															},
+														)}
 													</span>
 												</td>
 											</tr>
