@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabaseAgua } from '@/lib/supabase';
-import { NEXT_BODY_SUFFIX } from 'next/dist/lib/constants';
 
 export async function GET(request: Request) {
 	// Get company and warehouse of headers x-warehouse-id and x-company-id

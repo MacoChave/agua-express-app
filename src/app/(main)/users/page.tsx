@@ -27,7 +27,9 @@ const columns: Column<UserProfile>[] = [
 		render: (value, row) => (
 			<div className='flex flex-col'>
 				<span className='text-body-md font-semibold'>{value}</span>
-				<span className='text-label-md text-on-surface-variant'>{row.email}</span>
+				<span className='text-label-md text-on-surface-variant'>
+					{row.email}
+				</span>
 			</div>
 		),
 	},
@@ -36,7 +38,13 @@ const columns: Column<UserProfile>[] = [
 		header: 'ROL',
 		render: (value) => (
 			<StatusChip
-				status={value === 'admin' ? 'operational' : value === 'supervisor' ? 'info' : 'pending'}
+				status={
+					value === 'admin'
+						? 'operational'
+						: value === 'supervisor'
+							? 'info'
+							: 'pending'
+				}
 				label={String(value).toUpperCase()}
 			/>
 		),
@@ -103,7 +111,8 @@ export default function UsersPage() {
 			});
 
 			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || 'Error al crear usuario');
+			if (!res.ok)
+				throw new Error(data.error || 'Error al crear usuario');
 
 			setShowAddModal(false);
 			fetchUsers();
@@ -118,12 +127,16 @@ export default function UsersPage() {
 		<div className='pt-8 px-4 md:px-8 max-w-7xl mx-auto space-y-6'>
 			<section className='flex flex-col md:flex-row md:items-end justify-between gap-4'>
 				<div className='space-y-1'>
-					<h1 className='text-headline-lg text-primary'>Gestión de Usuarios</h1>
+					<h1 className='text-headline-lg text-primary'>
+						Gestión de Usuarios
+					</h1>
 					<p className='text-body-md text-on-surface-variant'>
 						Administra los accesos y roles de tu equipo.
 					</p>
 				</div>
-				<Button onClick={() => setShowAddModal(true)} className='rounded-xl'>
+				<Button
+					onClick={() => setShowAddModal(true)}
+					className='rounded-xl'>
 					<span>
 						<AddCircle className='w-5 h-5' />
 					</span>
@@ -137,9 +150,14 @@ export default function UsersPage() {
 				</div>
 			)}
 
-			<Card variant='default' padding='none' className='border border-surface-container overflow-hidden'>
+			<Card
+				variant='default'
+				padding='none'
+				className='border border-surface-container overflow-hidden'>
 				<div className='px-6 py-4 flex items-center justify-between border-b border-surface-container'>
-					<h3 className='text-headline-sm text-primary'>Usuarios Registrados</h3>
+					<h3 className='text-headline-sm text-primary'>
+						Usuarios Registrados
+					</h3>
 					<div className='w-64'>
 						<InputField
 							id='search'
@@ -151,7 +169,9 @@ export default function UsersPage() {
 				</div>
 				<div className='px-6 pb-6 pt-2'>
 					{loading ? (
-						<div className='py-20 text-center text-on-surface-variant'>Cargando usuarios...</div>
+						<div className='py-20 text-center text-on-surface-variant'>
+							Cargando usuarios...
+						</div>
 					) : (
 						<DataTable<UserProfile>
 							columns={columns}
@@ -166,8 +186,10 @@ export default function UsersPage() {
 			{/* Modal de Nuevo Usuario (Simulado con overlay fijo) */}
 			{showAddModal && (
 				<div className='fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50'>
-					<Card className='w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200'>
-						<h2 className='text-headline-sm text-primary mb-6'>Crear Nuevo Usuario</h2>
+					<Card className='w-full md:max-w-6/12 shadow-2xl animate-in fade-in zoom-in duration-200'>
+						<h2 className='text-headline-sm text-primary mb-6'>
+							Crear Nuevo Usuario
+						</h2>
 						<form onSubmit={handleAddUser} className='space-y-4'>
 							<InputField
 								id='fullName'
@@ -193,14 +215,17 @@ export default function UsersPage() {
 								required
 							/>
 							<div className='flex flex-col gap-1'>
-								<label className='text-label-md text-on-surface-variant'>Rol del Usuario</label>
+								<label className='text-label-md text-on-surface-variant'>
+									Rol del Usuario
+								</label>
 								<select
 									name='role'
 									className='w-full bg-surface-container-low text-on-surface border border-outline-variant rounded-md px-3 py-2'
-									defaultValue='operator'
-								>
+									defaultValue='operator'>
 									<option value='operator'>Operador</option>
-									<option value='supervisor'>Supervisor</option>
+									<option value='supervisor'>
+										Supervisor
+									</option>
 									<option value='admin'>Administrador</option>
 								</select>
 							</div>
@@ -210,11 +235,13 @@ export default function UsersPage() {
 									type='button'
 									variant='ghost'
 									fullWidth
-									onClick={() => setShowAddModal(false)}
-								>
+									onClick={() => setShowAddModal(false)}>
 									Cancelar
 								</Button>
-								<Button type='submit' fullWidth loading={isSaving}>
+								<Button
+									type='submit'
+									fullWidth
+									loading={isSaving}>
 									Crear Usuario
 								</Button>
 							</div>
