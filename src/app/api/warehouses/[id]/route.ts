@@ -6,8 +6,9 @@ export async function GET(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	const { id } = await params;
-	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	if (!companyId) {
 		return NextResponse.json(
@@ -41,8 +42,10 @@ export async function PATCH(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	const { id } = await params;
-	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const companyId = Number(request.headers.get('x-company-id'));
+
 	const body = await request.json();
 
 	if (!companyId) {
@@ -78,8 +81,9 @@ export async function DELETE(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	const { id } = await params;
-	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	if (!companyId) {
 		return NextResponse.json(

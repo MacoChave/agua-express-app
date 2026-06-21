@@ -3,9 +3,11 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
-	const warehouseId = searchParams.get('warehouse_id');
 	const equipmentId = searchParams.get('equipment_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	let query = supabase.from('maintenance_tasks').select('*');
 
@@ -30,10 +32,22 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
 	const body = await request.json();
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
+	body.warehouse_id = warehouseId;
+	body.company_id = companyId;
 
-	if (!body.company_id || !body.warehouse_id || !body.equipment_id || !body.maintenance_type_id) {
+	if (
+		!body.company_id ||
+		!body.warehouse_id ||
+		!body.equipment_id ||
+		!body.maintenance_type_id
+	) {
 		return NextResponse.json(
-			{ error: 'company_id, warehouse_id, equipment_id and maintenance_type_id are required' },
+			{
+				error: 'company_id, warehouse_id, equipment_id and maintenance_type_id are required',
+			},
 			{ status: 400 },
 		);
 	}
@@ -53,7 +67,10 @@ export async function POST(request: Request) {
 
 		if (fetchError && fetchError.code !== 'PGRST116') {
 			return NextResponse.json(
-				{ data: fetchError.code, error: 'Error al generar el número de serie' },
+				{
+					data: fetchError.code,
+					error: 'Error al generar el número de serie',
+				},
 				{ status: 500 },
 			);
 		}

@@ -1,21 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { TASKS } from '@/features/mantenimientos/types';
 import {
-	StatusBadge,
 	NewMaintenanceModal,
-} from '@/features/mantenimientos/components';
+	StatusBadge,
+} from '@/features/mantenimientos/components/NewMaintenance';
+import { TASKS } from '@/features/mantenimientos/types';
+import { useState } from 'react';
 
-import Notifications from '@/assets/icons/notifications.svg';
-import CheckCircle from '@/assets/icons/check_circle.svg';
-import ArrowForward from '@/assets/icons/arrow_forward.svg';
 import AddCircle from '@/assets/icons/add_circle.svg';
+import ArrowForward from '@/assets/icons/arrow_forward.svg';
+import CheckCircle from '@/assets/icons/check_circle.svg';
+import Event from '@/assets/icons/event.svg';
 import MoreVert from '@/assets/icons/more_vert.svg';
+import Notifications from '@/assets/icons/notifications.svg';
+import { ProgramarMantenimiento } from '@/features/mantenimientos/components/ProgramarMantenimiento';
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function MantenimientosPage() {
 	const [modalOpen, setModalOpen] = useState(false);
+	const [scheduleOpen, setScheduleOpen] = useState(false);
 
 	return (
 		<>
@@ -111,6 +114,16 @@ export default function MantenimientosPage() {
 								Registrar Nuevo Mantenimiento
 							</span>
 						</button>
+
+						{/* Schedule Maintenance Button */}
+						<button
+							onClick={() => setScheduleOpen(true)}
+							className='w-full bg-[var(--color-secondary)] text-[var(--color-on-secondary)] p-6 rounded-xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-lg group'>
+							<Event className='w-6 h-6 shrink-0' />
+							<span className='text-headline-sm font-semibold'>
+								Programar Mantenimiento
+							</span>
+						</button>
 					</div>
 
 					{/* ── Right Column ────────────────────── */}
@@ -189,6 +202,10 @@ export default function MantenimientosPage() {
 			<NewMaintenanceModal
 				open={modalOpen}
 				onClose={() => setModalOpen(false)}
+			/>
+			<ProgramarMantenimiento
+				isOpen={scheduleOpen}
+				onClose={() => setScheduleOpen(false)}
 			/>
 		</>
 	);

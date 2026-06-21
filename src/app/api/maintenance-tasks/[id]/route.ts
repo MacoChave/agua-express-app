@@ -7,10 +7,12 @@ export async function GET(
 ) {
 	const { id: serialNumber } = await params;
 	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
-	const warehouseId = searchParams.get('warehouse_id');
 	const equipmentId = searchParams.get('equipment_id');
 	const maintenanceTypeId = searchParams.get('maintenance_type_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	if (!companyId || !warehouseId || !equipmentId || !maintenanceTypeId) {
 		return NextResponse.json(
@@ -48,11 +50,13 @@ export async function PATCH(
 ) {
 	const { id: serialNumber } = await params;
 	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
-	const warehouseId = searchParams.get('warehouse_id');
 	const equipmentId = searchParams.get('equipment_id');
 	const maintenanceTypeId = searchParams.get('maintenance_type_id');
 	const body = await request.json();
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	if (!companyId || !warehouseId || !equipmentId || !maintenanceTypeId) {
 		return NextResponse.json(
@@ -91,10 +95,12 @@ export async function DELETE(
 ) {
 	const { id: serialNumber } = await params;
 	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
-	const warehouseId = searchParams.get('warehouse_id');
 	const equipmentId = searchParams.get('equipment_id');
 	const maintenanceTypeId = searchParams.get('maintenance_type_id');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	if (!companyId || !warehouseId || !equipmentId || !maintenanceTypeId) {
 		return NextResponse.json(

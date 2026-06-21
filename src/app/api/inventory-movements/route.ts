@@ -3,9 +3,11 @@ import { supabaseAgua } from '@/lib/supabase';
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
-	const companyId = searchParams.get('company_id');
-	const warehouseId = searchParams.get('warehouse_id');
 	const moveType = searchParams.get('move_type');
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
 
 	let query = supabaseAgua.from('inventory_movements').select('*');
 
@@ -13,7 +15,9 @@ export async function GET(request: Request) {
 	if (warehouseId) query = query.eq('warehouse_id', warehouseId);
 	if (moveType) query = query.eq('move_type', moveType);
 
-	const { data, error } = await query.order('created_at', { ascending: false });
+	const { data, error } = await query.order('created_at', {
+		ascending: false,
+	});
 
 	if (error) {
 		return NextResponse.json({ error: error.message }, { status: 500 });
@@ -24,6 +28,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
 	const body = await request.json();
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
+	body.warehouse_id = warehouseId;
+	body.company_id = companyId;
 
 	// Basic validation
 	if (!body.company_id || !body.warehouse_id || !body.move_type) {
@@ -47,7 +57,10 @@ export async function POST(request: Request) {
 
 		if (fetchError && fetchError.code !== 'PGRST116') {
 			// PGRST116 is "no rows found"
-			return NextResponse.json({ error: fetchError.message }, { status: 500 });
+			return NextResponse.json(
+				{ error: fetchError.message },
+				{ status: 500 },
+			);
 		}
 
 		body.serial_number = (lastMove?.serial_number || 0) + 1;

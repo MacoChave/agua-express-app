@@ -28,8 +28,12 @@ export default function LoginPage() {
 
 			const data = await res.json();
 
+			console.log({ data });
+
 			if (!res.ok) {
-				throw new Error(data.error || 'Ocurrió un error al iniciar sesión');
+				throw new Error(
+					data.error || 'Ocurrió un error al iniciar sesión',
+				);
 			}
 
 			router.push('/dashboard');
