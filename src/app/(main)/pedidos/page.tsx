@@ -1,63 +1,61 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Button, Card, InputField, StatusChip } from '@/components/ui';
-import {
-	type EstadoPedido,
-	ESTADO_CONFIG,
-	FILTROS_PEDIDO,
-	PEDIDOS_MOCK,
-} from '@/features/pedidos/types';
+import { Button, Card, StatusChip } from '@/components/ui';
+import { apiClient } from '@/lib/apiClient';
 import Add from '@/assets/icons/add.svg';
-import WaterDrop from '@/assets/icons/water_drop.svg';
 import ArrowLeft from '@/assets/icons/arrow_left.svg';
 import ArrowRight from '@/assets/icons/arrow_right.svg';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
 
-/* ── Componente ─────────────────────────────────────────── */
 export default function PedidosPage() {
-	const [busqueda, setBusqueda] = useState('');
-	const [filtroEstado, setFiltroEstado] = useState<EstadoPedido | 'todos'>(
-		'todos',
-	);
+	const [movements, setMovements] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
 	const [pagina, setPagina] = useState(1);
 
-	const pedidosFiltrados = useMemo(() => {
-		return PEDIDOS_MOCK.filter((p) => {
-			const coincideBusqueda =
-				p.cliente.toLowerCase().includes(busqueda.toLowerCase()) ||
-				p.id.toLowerCase().includes(busqueda.toLowerCase());
-			const coincideEstado =
-				filtroEstado === 'todos' || p.estado === filtroEstado;
-			return coincideBusqueda && coincideEstado;
-		});
-	}, [busqueda, filtroEstado]);
+	useEffect(() => {
+		async function fetchMovements() {
+			try {
+				const data = await apiClient.get<any[]>('/inventory-movements');
+				setMovements(data);
+			} catch (error) {
+				console.error('Error fetching inventory movements:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		fetchMovements();
+	}, []);
 
-	const totalPaginas = Math.ceil(pedidosFiltrados.length / PAGE_SIZE);
-	const pedidosPagina = pedidosFiltrados.slice(
+	const stats = useMemo(() => {
+		let totalSales = 0;
+		let totalIncome = 0;
+		let totalExpenses = 0;
+
+		movements.forEach((m) => {
+			if (m.move_type === 'VENTA') {
+				totalSales += Number(m.quantity || 0);
+				totalIncome += Number(m.price || 0);
+			} else if (m.move_type === 'COMPRA') {
+				totalExpenses += Number(m.price || 0);
+			}
+		});
+
+		return {
+			totalSales,
+			totalIncome,
+			totalExpenses,
+			balance: totalIncome - totalExpenses,
+		};
+	}, [movements]);
+
+	const totalPaginas = Math.ceil(movements.length / PAGE_SIZE);
+	const paginatedMovements = movements.slice(
 		(pagina - 1) * PAGE_SIZE,
 		pagina * PAGE_SIZE,
 	);
-
-	const stats = {
-		totalSales: PEDIDOS_MOCK.length,
-		totalShipping: PEDIDOS_MOCK.filter((p) => p.estado === 'en-camino')
-			.length,
-		totalBuys: PEDIDOS_MOCK.filter((p) => p.estado === 'entregado').length,
-		balance: PEDIDOS_MOCK.filter((p) => p.estado === 'pendiente').length,
-	};
-
-	const handleFiltro = (valor: EstadoPedido | 'todos') => {
-		setFiltroEstado(valor);
-		setPagina(1);
-	};
-
-	const handleBusqueda = (valor: string) => {
-		setBusqueda(valor);
-		setPagina(1);
-	};
 
 	return (
 		<div style={{ color: 'var(--color-on-surface)' }}>
@@ -68,15 +66,14 @@ export default function PedidosPage() {
 						<h2
 							className='text-headline-lg'
 							style={{ color: 'var(--color-primary)' }}>
-							Gestión de Pedidos
+							Movimientos de Inventario
 						</h2>
 						<p
 							className='text-body-md mt-1'
 							style={{
 								color: 'var(--color-on-surface-variant)',
 							}}>
-							Control centralizado de suministros activos y
-							entregas.
+							Registro general de ventas y gastos de la bodega.
 						</p>
 					</div>
 					<Link href='/anadir-pedido'>
@@ -93,40 +90,32 @@ export default function PedidosPage() {
 						{
 							label: 'Ventas totales (Unidades)',
 							value: stats.totalSales,
+							isCurrency: false,
 							color: 'var(--color-primary)',
 						},
 						{
 							label: 'Ingresos totales (Q)',
-							value: stats.totalShipping,
+							value: stats.totalIncome,
+							isCurrency: true,
 							color: 'var(--color-secondary)',
 						},
 						{
 							label: 'Gastos registrados (Q)',
-							value: stats.totalBuys,
+							value: stats.totalExpenses,
+							isCurrency: true,
 							color: 'var(--color-on-primary-container)',
 						},
 						{
 							label: 'Balance neto',
 							value: stats.balance,
-							color: 'var(--color-error)',
+							isCurrency: true,
+							color: stats.balance >= 0 ? 'var(--color-primary)' : 'var(--color-error)',
 						},
-					].map(({ label, value, color }) => (
+					].map(({ label, value, color, isCurrency }) => (
 						<Card
 							key={label}
 							variant='outlined'
-							padding='md'
-							hoverable
-							onClick={() =>
-								handleFiltro(
-									label === 'Total Hoy'
-										? 'todos'
-										: label === 'En camino'
-											? 'en-camino'
-											: label === 'Entregados'
-												? 'entregado'
-												: 'pendiente',
-								)
-							}>
+							padding='md'>
 							<p
 								className='text-label-md'
 								style={{
@@ -137,18 +126,23 @@ export default function PedidosPage() {
 							<p
 								className='text-headline-sm mt-1'
 								style={{ color }}>
-								{String(value).padStart(2, '0')}
+								{isCurrency ? (
+									<span className="font-bold">
+										${value.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
+									</span>
+								) : (
+									String(value)
+								)}
 							</p>
 						</Card>
 					))}
 				</div>
 
-				{/* ── Tabla de pedidos ──────────────────────── */}
+				{/* ── Tabla de movimientos ──────────────────────── */}
 				<Card
 					variant='default'
 					padding='none'
 					className='overflow-hidden'>
-					{/* Tabla */}
 					<div className='overflow-x-auto'>
 						<table className='w-full text-left border-collapse'>
 							<thead
@@ -158,15 +152,15 @@ export default function PedidosPage() {
 								}}>
 								<tr>
 									{[
-										'CLIENTE',
-										'CANT. BOTELLONES',
+										'FECHA',
+										'TIPO',
+										'DETALLE',
+										'CANTIDAD',
 										'TOTAL',
-										'ESTADO',
-										'ACCIONES',
 									].map((h) => (
 										<th
 											key={h}
-											className={`px-6 py-3 text-label-md border-b ${h === 'ACCIONES' ? 'text-right' : ''}`}
+											className={`px-6 py-3 text-label-md border-b ${h === 'TOTAL' ? 'text-right' : ''}`}
 											style={{
 												color: 'var(--color-on-surface-variant)',
 												borderColor:
@@ -178,7 +172,7 @@ export default function PedidosPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{pedidosPagina.length === 0 ? (
+								{loading ? (
 									<tr>
 										<td
 											colSpan={5}
@@ -186,125 +180,87 @@ export default function PedidosPage() {
 											style={{
 												color: 'var(--color-on-surface-variant)',
 											}}>
-											Sin pedidos que coincidan con la
-											búsqueda.
+											Cargando movimientos...
+										</td>
+									</tr>
+								) : paginatedMovements.length === 0 ? (
+									<tr>
+										<td
+											colSpan={5}
+											className='text-center py-12 text-body-md'
+											style={{
+												color: 'var(--color-on-surface-variant)',
+											}}>
+											No hay movimientos registrados.
 										</td>
 									</tr>
 								) : (
-									pedidosPagina.map((pedido) => {
-										const cfg =
-											ESTADO_CONFIG[pedido.estado];
+									paginatedMovements.map((move, i) => {
+										const isExpense = move.move_type === 'COMPRA';
+										const detailText = isExpense 
+											? (move.expense_type_id ? `Gasto: ${move.expense_type_id}` : 'Gasto General') 
+											: (move.notes || 'Venta de producto');
+
 										return (
 											<tr
-												key={pedido.id}
+												key={`${move.move_date}-${i}`}
 												className='border-b last:border-0 transition-colors'
 												style={{
 													borderColor:
 														'var(--color-outline-variant)',
 												}}
 												onMouseEnter={(e) => {
-													(
-														e.currentTarget as HTMLTableRowElement
-													).style.backgroundColor =
+													(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
 														'var(--color-surface-bright)';
 												}}
 												onMouseLeave={(e) => {
-													(
-														e.currentTarget as HTMLTableRowElement
-													).style.backgroundColor =
+													(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
 														'transparent';
 												}}>
-												{/* Cliente */}
+												
+												{/* Fecha */}
 												<td className='px-6 py-4'>
-													<div className='flex items-center gap-3'>
-														<div
-															className='w-9 h-9 rounded-full grid place-items-center font-bold text-xs shrink-0'
-															style={{
-																backgroundColor:
-																	pedido.avatarColor,
-																color: 'var(--color-primary)',
-															}}>
-															{pedido.iniciales}
-														</div>
-														<div>
-															<p
-																className='text-body-md font-semibold'
-																style={{
-																	color: 'var(--color-on-surface)',
-																}}>
-																{pedido.cliente}
-															</p>
-															<p
-																className='text-label-md'
-																style={{
-																	color: 'var(--color-on-surface-variant)',
-																}}>
-																ID: #{pedido.id}
-															</p>
-														</div>
-													</div>
-												</td>
-
-												{/* Botellones */}
-												<td className='px-6 py-4'>
-													<div className='flex items-center gap-1 text-body-md'>
-														<WaterDrop className='w-4 h-4 text-primary' />
-														<span>
-															{pedido.botellones}{' '}
-															Unidades
-														</span>
-													</div>
-												</td>
-
-												{/* Total */}
-												<td className='px-6 py-4'>
-													<span
-														className='text-body-md font-bold'
-														style={{
-															color: 'var(--color-on-surface)',
-														}}>
-														$
-														{pedido.total.toLocaleString(
-															'es-GT',
-															{
-																style: 'currency',
-																currency: 'GTQ',
-																minimumFractionDigits: 2,
-															},
-														)}
+													<span className='text-body-md font-medium'>
+														{new Date(move.move_date).toLocaleDateString('es-GT', {
+															day: '2-digit',
+															month: 'short',
+															year: 'numeric'
+														})}
 													</span>
 												</td>
 
-												{/* Estado */}
+												{/* Tipo */}
 												<td className='px-6 py-4'>
 													<StatusChip
-														status={cfg.status}
-														label={cfg.label}
+														status={isExpense ? 'alert' : 'operational'}
+														label={move.move_type}
 													/>
 												</td>
 
-												{/* Acciones */}
+												{/* Detalle */}
+												<td className='px-6 py-4 max-w-[200px] truncate text-body-md'>
+													{detailText}
+												</td>
+
+												{/* Cantidad */}
+												<td className='px-6 py-4'>
+													<span className='text-body-md font-medium'>
+														{move.quantity} {isExpense ? 'und.' : 'botellones'}
+													</span>
+												</td>
+
+												{/* Total */}
 												<td className='px-6 py-4 text-right'>
-													<button
-														className='p-2 rounded-full transition-colors'
+													<span
+														className='text-body-md font-bold'
 														style={{
-															color: 'var(--color-on-surface-variant)',
-														}}
-														onMouseEnter={(e) =>
-															((
-																e.currentTarget as HTMLButtonElement
-															).style.backgroundColor =
-																'var(--color-surface-variant)')
-														}
-														onMouseLeave={(e) =>
-															((
-																e.currentTarget as HTMLButtonElement
-															).style.backgroundColor =
-																'transparent')
-														}
-														aria-label={`Acciones para ${pedido.cliente}`}>
-														⋮
-													</button>
+															color: isExpense ? 'var(--color-error)' : 'var(--color-primary)',
+														}}>
+														{isExpense ? '-' : '+'}$
+														{Number(move.price).toLocaleString('es-GT', {
+															minimumFractionDigits: 2,
+														})}
+													</span>
 												</td>
 											</tr>
 										);
@@ -327,8 +283,8 @@ export default function PedidosPage() {
 							style={{
 								color: 'var(--color-on-surface-variant)',
 							}}>
-							Mostrando {pedidosPagina.length} de{' '}
-							{pedidosFiltrados.length} pedidos
+							Mostrando {paginatedMovements.length} de{' '}
+							{movements.length} movimientos
 						</p>
 						<div className='flex items-center gap-2'>
 							<button

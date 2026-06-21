@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Save from '@/assets/icons/save.svg';
 import CloudUpload from '@/assets/icons/cloud_upload.svg';
 import { InputField } from '@/components/ui';
 import { apiClient } from '@/lib/apiClient';
+import { createClient } from '@/lib/supabase/client';
 
 interface GastoFormProps {
 	onConfirm: () => void;
@@ -15,7 +16,23 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 	const [monto, setMonto] = useState('');
 	const [archivo, setArchivo] = useState<File | null>(null);
 	const [loading, setLoading] = useState(false);
+	const [expenseTypes, setExpenseTypes] = useState<any[]>([]);
+	const [loadingTypes, setLoadingTypes] = useState(true);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		async function fetchExpenseTypes() {
+			try {
+				const data = await apiClient.get<any[]>('/expense-types');
+				setExpenseTypes(data);
+			} catch (error) {
+				console.error('Error fetching expense types:', error);
+			} finally {
+				setLoadingTypes(false);
+			}
+		}
+		fetchExpenseTypes();
+	}, []);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -35,18 +52,43 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 
 		setLoading(true);
 		try {
-			// En un escenario real, cargaríamos el archivo a Storage primero
-			// y obtendríamos la URL para el campo 'evidence'.
+			let evidenceUrl = null;
+
+			// Si hay un archivo, súbelo a Supabase Storage primero
+			if (archivo) {
+				const supabase = createClient();
+				// Crear un nombre de archivo único para evitar colisiones
+				const fileExt = archivo.name.split('.').pop();
+				const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+				const filePath = `${tipoGasto}/${fileName}`;
+
+				const { error: uploadError } = await supabase.storage
+					.from('evidence')
+					.upload(filePath, archivo);
+
+				if (uploadError) {
+					console.error('Error uploading file:', uploadError);
+					alert('Error al subir la evidencia. Por favor intente de nuevo.');
+					setLoading(false);
+					return;
+				}
+
+				// Obtener la URL pública del archivo subido
+				const { data: publicUrlData } = supabase.storage
+					.from('evidence')
+					.getPublicUrl(filePath);
+
+				evidenceUrl = publicUrlData.publicUrl;
+			}
+
 			await apiClient.post('/inventory-movements', {
-				company_id: 1,
-				warehouse_id: 1,
-				move_type: 'gasto', // Placeholder para tipo de movimiento de gasto
+				move_type: 'COMPRA', // Placeholder para tipo de movimiento de gasto
 				quantity: 1, // Un gasto suele ser una unidad
 				price: parseFloat(monto),
 				expense_type_id: tipoGasto,
 				move_date: new Date().toISOString().split('T')[0],
 				notes: `Registro de gasto: ${tipoGasto}`,
-				evidence: archivo ? archivo.name : null, // Placeholder
+				evidence: evidenceUrl,
 			});
 			onConfirm();
 		} catch (error) {
@@ -63,7 +105,8 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 				className='rounded-xl p-6 border space-y-6'
 				style={{
 					backgroundColor: 'var(--color-surface-container-lowest)',
-					borderColor: 'color-mix(in srgb, var(--color-outline-variant) 20%, transparent)',
+					borderColor:
+						'color-mix(in srgb, var(--color-outline-variant) 20%, transparent)',
 					boxShadow: '0 4px 12px rgba(0,77,122,0.08)',
 				}}>
 				<h2
@@ -84,16 +127,23 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						<select
 							value={tipoGasto}
 							onChange={(e) => setTipoGasto(e.target.value)}
-							className='w-full bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] rounded-[var(--radius-md)] px-3 py-2 text-body-md focus:outline-none focus:border-[var(--color-secondary)] focus:ring-2 focus:ring-[var(--color-secondary)]/20 transition-all appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:1em_1em]'
+							disabled={loadingTypes}
+							className='w-full bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] rounded-[var(--radius-md)] px-3 py-2 text-body-md focus:outline-none focus:border-[var(--color-secondary)] focus:ring-2 focus:ring-[var(--color-secondary)]/20 transition-all appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:1em_1em] disabled:opacity-50'
 							style={{
 								backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z'/%3E%3C/svg%3E")`,
-							}}
-						>
-							<option value='' disabled>Seleccionar tipo</option>
-							<option value='combustible'>Combustible</option>
-							<option value='mantenimiento'>Mantenimiento</option>
-							<option value='repuestos'>Repuestos</option>
-							<option value='otros'>Otros</option>
+							}}>
+							<option value='' disabled>
+								{loadingTypes
+									? 'Cargando tipos...'
+									: 'Seleccionar tipo'}
+							</option>
+							{expenseTypes.map((type) => (
+								<option
+									key={type.expense_type}
+									value={type.expense_type}>
+									{type.name}
+								</option>
+							))}
 						</select>
 					</div>
 
@@ -104,7 +154,11 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						placeholder='0.00'
 						value={monto}
 						onChange={(e) => setMonto(e.target.value)}
-						leadingIcon={<span className='text-body-md font-semibold'>$</span>}
+						leadingIcon={
+							<span className='text-body-md font-semibold'>
+								$
+							</span>
+						}
 					/>
 
 					{/* Subir Evidencia */}
@@ -117,7 +171,8 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 							ref={fileInputRef}
 							onChange={handleFileChange}
 							className='hidden'
-							accept='image/*,.pdf'
+							accept='image/*,capture=camera,.pdf'
+							capture='environment'
 						/>
 						<button
 							type='button'
@@ -126,8 +181,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 							style={{
 								borderColor: 'var(--color-outline-variant)',
 								color: 'var(--color-on-surface-variant)',
-							}}
-						>
+							}}>
 							{archivo ? (
 								<div className='flex flex-col items-center'>
 									<span className='text-body-md font-medium text-[var(--color-primary)]'>
@@ -140,7 +194,9 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 							) : (
 								<>
 									<CloudUpload className='w-8 h-8 opacity-50' />
-									<span className='text-body-md'>Subir archivo</span>
+									<span className='text-body-md'>
+										Subir archivo
+									</span>
 								</>
 							)}
 						</button>

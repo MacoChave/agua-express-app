@@ -24,9 +24,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 		try {
 			// En un escenario real, estos IDs vendrían del contexto de usuario/sesión
 			await apiClient.post('/inventory-movements', {
-				company_id: 1,
-				warehouse_id: 1,
-				move_type: 'venta',
+				move_type: 'VENTA',
 				quantity: cantidad,
 				price: total,
 				move_date: new Date().toISOString().split('T')[0],
@@ -47,7 +45,8 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 				className='rounded-xl p-6 border space-y-6'
 				style={{
 					backgroundColor: 'var(--color-surface-container-lowest)',
-					borderColor: 'color-mix(in srgb, var(--color-outline-variant) 20%, transparent)',
+					borderColor:
+						'color-mix(in srgb, var(--color-outline-variant) 20%, transparent)',
 					boxShadow: '0 4px 12px rgba(0,77,122,0.08)',
 				}}>
 				<h2
