@@ -42,8 +42,6 @@ export async function POST(request: Request) {
 		.single();
 
 	if (error) {
-		console.log({ error });
-
 		return NextResponse.json(
 			{
 				data: error.code,
