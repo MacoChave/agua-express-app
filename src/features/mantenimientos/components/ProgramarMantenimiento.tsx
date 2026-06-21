@@ -7,25 +7,11 @@
 
 import { useState, useEffect } from 'react';
 import { Button, InputField } from '@/components/ui';
+import { apiClient } from '@/lib/apiClient';
 import Close from '@/assets/icons/close.svg';
 import Event from '@/assets/icons/event.svg';
 import Build from '@/assets/icons/build.svg';
 import KeyboardArrowDown from '@/assets/icons/keyboard_arrow_down.svg';
-
-/* ─── Options ────────────────────────────────────────── */
-const EQUIPMENT_OPTIONS = [
-	'Planta Central - Unidad 04',
-	'Sector Norte - Bomba 12',
-	'Tanque Sedimentación A',
-	'Módulo Osmosis Inversa 02',
-];
-
-const MAINTENANCE_TYPES = [
-	'Backwash (Retrolavado)',
-	'Cambio de Filtro',
-	'Análisis de Calidad de Agua',
-	'Reemplazo de Lámpara UV',
-];
 
 export interface ProgramarMantenimientoProps {
 	isOpen: boolean;
@@ -36,9 +22,13 @@ export function ProgramarMantenimiento({
 	isOpen,
 	onClose,
 }: ProgramarMantenimientoProps) {
+	const [equipments, setEquipments] = useState<any[]>([]);
+	const [maintenanceTypes, setMaintenanceTypes] = useState<any[]>([]);
+	const [loadingData, setLoadingData] = useState(true);
+
 	const [form, setForm] = useState({
-		equipment: EQUIPMENT_OPTIONS[0],
-		type: MAINTENANCE_TYPES[0],
+		equipment: '',
+		type: '',
 		quantity: 1,
 		recurrence: 'monthly',
 	});
@@ -46,7 +36,30 @@ export function ProgramarMantenimiento({
 	const [submitting, setSubmitting] = useState(false);
 
 	useEffect(() => {
+		async function fetchData() {
+			try {
+				const [eqRes, typeRes] = await Promise.all([
+					apiClient.get<any[]>('/equipment'),
+					apiClient.get<any[]>('/maintenance-types'),
+				]);
+				setEquipments(eqRes);
+				setMaintenanceTypes(typeRes);
+
+				if (eqRes.length > 0 && typeRes.length > 0) {
+					setForm((prev) => ({
+						...prev,
+						equipment: String(eqRes[0].id),
+						type: typeRes[0].id,
+					}));
+				}
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			} finally {
+				setLoadingData(false);
+			}
+		}
 		if (isOpen) {
+			fetchData();
 			document.body.style.overflow = 'hidden';
 		} else {
 			document.body.style.overflow = 'unset';
@@ -70,10 +83,22 @@ export function ProgramarMantenimiento({
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setSubmitting(true);
-		// Simulamos llamada a API
-		await new Promise((r) => setTimeout(r, 1200));
-		setSubmitting(false);
-		onClose();
+
+		try {
+			await apiClient.post('/maintenance-schedules', {
+				equipment_id: Number(form.equipment),
+				maintenance_type_id: form.type,
+				frequency: form.quantity,
+				period_type: form.recurrence,
+			});
+
+			onClose();
+		} catch (error) {
+			console.error('Error scheduling maintenance:', error);
+			alert('Hubo un error al programar el mantenimiento.');
+		} finally {
+			setSubmitting(false);
+		}
 	};
 
 	return (
@@ -121,12 +146,28 @@ export function ProgramarMantenimiento({
 										name='equipment'
 										value={form.equipment}
 										onChange={handleChange}
-										className='w-full bg-[var(--color-surface-container-low)] border-none rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[var(--color-secondary-container)] transition-all text-body-md text-[var(--color-on-surface)] h-12'>
-										{EQUIPMENT_OPTIONS.map((opt) => (
-											<option key={opt} value={opt}>
-												{opt}
+										disabled={
+											loadingData ||
+											equipments.length === 0
+										}
+										className='w-full bg-[var(--color-surface-container-low)] border-none rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[var(--color-secondary-container)] transition-all text-body-md text-[var(--color-on-surface)] h-12 disabled:opacity-50'>
+										{loadingData ? (
+											<option value=''>
+												Cargando...
 											</option>
-										))}
+										) : equipments.length === 0 ? (
+											<option value=''>
+												No hay equipos registrados
+											</option>
+										) : (
+											equipments.map((opt) => (
+												<option
+													key={opt.id}
+													value={opt.id}>
+													{opt.name}
+												</option>
+											))
+										)}
 									</select>
 									<KeyboardArrowDown className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-on-surface-variant)]' />
 								</div>
@@ -141,12 +182,28 @@ export function ProgramarMantenimiento({
 										name='type'
 										value={form.type}
 										onChange={handleChange}
-										className='w-full bg-[var(--color-surface-container-low)] border-none rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[var(--color-secondary-container)] transition-all text-body-md text-[var(--color-on-surface)] h-12'>
-										{MAINTENANCE_TYPES.map((opt) => (
-											<option key={opt} value={opt}>
-												{opt}
+										disabled={
+											loadingData ||
+											maintenanceTypes.length === 0
+										}
+										className='w-full bg-[var(--color-surface-container-low)] border-none rounded-xl py-3 pl-4 pr-10 appearance-none focus:ring-2 focus:ring-[var(--color-secondary-container)] transition-all text-body-md text-[var(--color-on-surface)] h-12 disabled:opacity-50'>
+										{loadingData ? (
+											<option value=''>
+												Cargando...
 											</option>
-										))}
+										) : maintenanceTypes.length === 0 ? (
+											<option value=''>
+												No hay tipos registrados
+											</option>
+										) : (
+											maintenanceTypes.map((opt) => (
+												<option
+													key={opt.id}
+													value={opt.id}>
+													{opt.name}
+												</option>
+											))
+										)}
 									</select>
 									<KeyboardArrowDown className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-on-surface-variant)]' />
 								</div>
@@ -191,11 +248,16 @@ export function ProgramarMantenimiento({
 						</div>
 					</div>
 
-					<div className='pt-4'>
+					<div className='pt-4 px-6 pb-6'>
 						<Button
 							type='submit'
 							fullWidth
 							size='lg'
+							disabled={
+								loadingData ||
+								equipments.length === 0 ||
+								maintenanceTypes.length === 0
+							}
 							loading={submitting}
 							className='h-14 text-headline-sm shadow-lg shadow-[var(--color-primary)]/20'>
 							Confirmar Programación

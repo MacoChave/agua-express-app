@@ -1,11 +1,8 @@
 'use client';
 
-import {
-	NewMaintenanceModal,
-	StatusBadge,
-} from '@/features/mantenimientos/components/NewMaintenance';
-import { TASKS } from '@/features/mantenimientos/types';
-import { useState } from 'react';
+import { NewMaintenanceModal, StatusBadge } from '@/features/mantenimientos/components/NewMaintenance';
+import { useState, useEffect } from 'react';
+import { apiClient } from '@/lib/apiClient';
 
 import AddCircle from '@/assets/icons/add_circle.svg';
 import ArrowForward from '@/assets/icons/arrow_forward.svg';
@@ -19,6 +16,22 @@ import { ProgramarMantenimiento } from '@/features/mantenimientos/components/Pro
 export default function MantenimientosPage() {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [scheduleOpen, setScheduleOpen] = useState(false);
+	const [tasks, setTasks] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		async function fetchTasks() {
+			try {
+				const data = await apiClient.get<any[]>('/maintenance-tasks');
+				setTasks(data);
+			} catch (error) {
+				console.error('Error fetching maintenance tasks:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		fetchTasks();
+	}, [modalOpen, scheduleOpen]); // Refresh when modals close
 
 	return (
 		<>
@@ -142,56 +155,83 @@ export default function MantenimientosPage() {
 
 							{/* Task List */}
 							<div className='divide-y divide-[var(--color-outline-variant)]'>
-								{TASKS.map((task) => (
-									<div
-										key={task.id}
-										className='p-6 hover:bg-[var(--color-surface-container-low)] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4'>
-										{/* Left: icon + info */}
-										<div className='flex gap-4'>
-											<div>
-												<h4 className='text-body-lg font-bold text-[var(--color-on-surface)]'>
-													{task.title}
-												</h4>
-												<p className='text-body-sm text-[var(--color-on-surface-variant)]'>
-													{task.operator
-														? `Operador: ${task.operator} • `
-														: ''}
-													{task.time}
-												</p>
-											</div>
-										</div>
-
-										{/* Right: status + menu */}
-										<div className='flex items-center justify-between md:justify-end gap-6'>
-											{/* Desktop: text status */}
-											<div className='text-right hidden md:block'>
-												<p className='text-label-md text-[var(--color-outline)]'>
-													Estado
-												</p>
-												<span
-													className={`font-bold text-body-sm ${
-														task.status ===
-														'completed'
-															? 'text-green-600'
-															: 'text-[var(--color-error)]'
-													}`}>
-													{task.status === 'completed'
-														? 'Completado'
-														: 'Pendiente'}
-												</span>
-											</div>
-											{/* Mobile: badge */}
-											<div className='md:hidden'>
-												<StatusBadge
-													status={task.status}
-												/>
-											</div>
-											<button className='p-2 hover:bg-[var(--color-surface-variant)] rounded-full transition-all'>
-												<MoreVert className='w-5 h-5 text-[var(--color-on-surface-variant)]' />
-											</button>
-										</div>
+								{loading ? (
+									<div className='p-6 text-center text-body-md text-[var(--color-on-surface-variant)]'>
+										Cargando tareas...
 									</div>
-								))}
+								) : tasks.length === 0 ? (
+									<div className='p-6 text-center text-body-md text-[var(--color-on-surface-variant)]'>
+										No hay tareas registradas.
+									</div>
+								) : (
+									tasks.map((task) => {
+										// Inferir status basado en la presencia de evidencia o notas,
+										// o si la fecha es en el futuro.
+										const taskDate = new Date(task.date);
+										const today = new Date();
+										let inferredStatus: 'completed' | 'pending' | 'in-progress' = 'pending';
+										
+										if (task.evidence || task.notes || taskDate <= today) {
+											inferredStatus = 'completed';
+											// Si la fecha es pasada o de hoy y NO tiene notas/evidencia, asumiremos que se completó igual para no dejarlo colgado, o podríamos usar 'pending' si prefieren. Por ahora usaremos la lógica: si tiene evidencia o notas, o si la fecha ya pasó, está completed.
+											// Ajuste fino: si no tiene notas ni evidencia, y es a futuro, pending.
+											if (!task.evidence && !task.notes && taskDate > today) {
+												inferredStatus = 'pending';
+											}
+										}
+
+										const title = task.equipment?.name 
+											? `${task.maintenance_types?.name || 'Mantenimiento'} - ${task.equipment.name}`
+											: `Tarea #${task.serial_number}`;
+
+										return (
+											<div
+												key={`${task.equipment_id}-${task.maintenance_type_id}-${task.serial_number}`}
+												className='p-6 hover:bg-[var(--color-surface-container-low)] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4'>
+												{/* Left: icon + info */}
+												<div className='flex gap-4'>
+													<div>
+														<h4 className='text-body-lg font-bold text-[var(--color-on-surface)]'>
+															{title}
+														</h4>
+														<p className='text-body-sm text-[var(--color-on-surface-variant)]'>
+															Fecha: {new Date(task.date).toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' })}
+														</p>
+													</div>
+												</div>
+
+												{/* Right: status + menu */}
+												<div className='flex items-center justify-between md:justify-end gap-6'>
+													{/* Desktop: text status */}
+													<div className='text-right hidden md:block'>
+														<p className='text-label-md text-[var(--color-outline)]'>
+															Estado
+														</p>
+														<span
+															className={`font-bold text-body-sm ${
+																inferredStatus === 'completed'
+																	? 'text-green-600'
+																	: 'text-[var(--color-error)]'
+															}`}>
+															{inferredStatus === 'completed'
+																? 'Completado'
+																: 'Pendiente'}
+														</span>
+													</div>
+													{/* Mobile: badge */}
+													<div className='md:hidden'>
+														<StatusBadge
+															status={inferredStatus}
+														/>
+													</div>
+													<button className='p-2 hover:bg-[var(--color-surface-variant)] rounded-full transition-all'>
+														<MoreVert className='w-5 h-5 text-[var(--color-on-surface-variant)]' />
+													</button>
+												</div>
+											</div>
+										);
+									})
+								)}
 							</div>
 						</div>
 					</div>

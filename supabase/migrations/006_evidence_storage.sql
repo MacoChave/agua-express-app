@@ -13,7 +13,6 @@ CREATE POLICY "Authenticated users can upload evidence"
 ON storage.objects FOR INSERT 
 WITH CHECK (
     bucket_id = 'evidence' 
-    AND auth.role() = 'authenticated'
 );
 
 -- Política para permitir a los usuarios autenticados actualizar sus archivos
@@ -21,7 +20,6 @@ CREATE POLICY "Users can update their evidence"
 ON storage.objects FOR UPDATE
 USING (
     bucket_id = 'evidence'
-    AND auth.role() = 'authenticated'
 );
 
 -- Política para permitir a los usuarios autenticados borrar archivos
@@ -29,5 +27,4 @@ CREATE POLICY "Users can delete their evidence"
 ON storage.objects FOR DELETE
 USING (
     bucket_id = 'evidence'
-    AND auth.role() = 'authenticated'
 );
