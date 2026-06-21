@@ -42,20 +42,16 @@ export async function updateSession(request: NextRequest) {
 
 	// If we have a user, fetch their company and warehouse context
 	if (user) {
-		const { data: sessionData } = await supabase.auth.getSession();
+		// Call a SECURITY DEFINER function to bypass RLS issues in the Edge runtime
+		const { data, error } = await supabase.rpc('get_profile_by_id', {
+			user_id: user.id,
+		});
 
-		// Explicitly set the Authorization header to guarantee PostgREST receives the token.
-		// Sometimes Next.js middleware drops headers in the global fetch override.
-		const { data, error } = await supabase
-			.from('profiles')
-			// We add "id" here purely to change the request URL and bust the Next.js persistent fetch cache on disk!
-			.select('company_id, warehouse_id, id')
-			.eq('id', user.id)
-			.setHeader(
-				'Authorization',
-				`Bearer ${sessionData.session?.access_token}`,
-			)
-			.single();
+		console.log({ userId: user.id, data, error });
+
+		if (error) {
+			console.error('Error fetching profile:', error);
+		}
 
 		if (data) {
 			const requestHeaders = new Headers(request.headers);

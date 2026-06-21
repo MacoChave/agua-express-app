@@ -73,8 +73,6 @@ export async function PATCH(
 		.single();
 
 	if (error) {
-		console.log({ error });
-
 		return NextResponse.json(
 			{
 				data: error.code,
@@ -115,7 +113,6 @@ export async function DELETE(
 		.eq('move_type', moveType);
 
 	if (error) {
-		console.log({ error });
 		return NextResponse.json(
 			{
 				data: error.code,

@@ -11,8 +11,6 @@ export async function GET(request: Request) {
 	if (companyId) query = query.eq('company_id', companyId);
 	if (warehouseId) query = query.eq('warehouse_id', warehouseId);
 
-	console.log({ query });
-
 	const { data, error } = await query;
 
 	if (error) {

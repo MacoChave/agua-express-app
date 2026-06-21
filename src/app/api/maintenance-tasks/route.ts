@@ -18,6 +18,7 @@ export async function GET(request: Request) {
 	const { data, error } = await query.order('date', { ascending: false });
 
 	if (error) {
+		console.error('PGRST Error:', error);
 		return NextResponse.json(
 			{
 				data: error.code,
@@ -27,7 +28,29 @@ export async function GET(request: Request) {
 		);
 	}
 
-	return NextResponse.json(data);
+	// Fetch equipment and maintenance types manually to avoid PGRST200 on composite foreign keys
+	if (data && data.length > 0) {
+		const equipmentIds = [...new Set(data.map((t: any) => t.equipment_id))];
+		const typeIds = [...new Set(data.map((t: any) => t.maintenance_type_id))];
+
+		const [eqRes, typeRes] = await Promise.all([
+			supabase.from('equipment').select('id, name').in('id', equipmentIds),
+			supabase.from('maintenance_types').select('id, name').in('id', typeIds)
+		]);
+
+		const eqMap = new Map(eqRes.data?.map((e: any) => [e.id, e.name]) || []);
+		const typeMap = new Map(typeRes.data?.map((t: any) => [t.id, t.name]) || []);
+
+		const enrichedData = data.map((task: any) => ({
+			...task,
+			equipment: { name: eqMap.get(task.equipment_id) },
+			maintenance_types: { name: typeMap.get(task.maintenance_type_id) }
+		}));
+
+		return NextResponse.json(enrichedData);
+	}
+
+	return NextResponse.json(data || []);
 }
 
 export async function POST(request: Request) {

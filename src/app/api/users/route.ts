@@ -9,8 +9,6 @@ export async function GET() {
 		.select('*')
 		.order('created_at', { ascending: false });
 
-	console.log({ users, error });
-
 	if (error) {
 		return NextResponse.json({ error: error.message }, { status: 500 });
 	}
@@ -20,6 +18,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	const { email, password, fullName, role } = await request.json();
+
+	// Get company and warehouse of headers x-warehouse-id and x-company-id
+	const warehouseId = Number(request.headers.get('x-warehouse-id'));
+	const companyId = Number(request.headers.get('x-company-id'));
+
 	const supabase = await createClient();
 
 	// 1. Get current admin's company_id
@@ -78,7 +81,8 @@ export async function POST(request: Request) {
 	// 3. Create the profile for the new user
 	const { error: profileError } = await adminClient.from('profiles').insert({
 		id: authData.user.id,
-		company_id: adminProfile.company_id,
+		company_id: companyId,
+		warehouse_id: warehouseId,
 		full_name: fullName,
 		email: email,
 		role: role || 'operator',
