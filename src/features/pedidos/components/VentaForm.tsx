@@ -13,6 +13,7 @@ interface VentaFormProps {
 export default function VentaForm({ onConfirm }: VentaFormProps) {
 	const [cantidad, setCantidad] = useState(50);
 	const [total, setTotal] = useState(350);
+	const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
 	const [loading, setLoading] = useState(false);
 
 	const handleCantidad = (delta: number) => {
@@ -27,7 +28,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 				move_type: 'VENTA',
 				quantity: cantidad,
 				price: total,
-				move_date: new Date().toISOString().split('T')[0],
+				move_date: fecha,
 				notes: `Venta directa: ${cantidad} garrafones`,
 			});
 			onConfirm();
@@ -128,6 +129,27 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 								setTotal(val);
 							}}
 							className='w-full text-center border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
+							style={{
+								borderColor: 'var(--color-outline-variant)',
+								color: 'var(--color-primary)',
+							}}
+						/>
+					</div>
+
+					{/* Fecha de movimiento */}
+					<div className='space-y-1 col-span-2'>
+						<label
+							className='text-label-md font-medium'
+							style={{
+								color: 'var(--color-on-surface-variant)',
+							}}>
+							Fecha de movimiento
+						</label>
+						<input
+							type='date'
+							value={fecha}
+							onChange={(e) => setFecha(e.target.value)}
+							className='w-full border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
 							style={{
 								borderColor: 'var(--color-outline-variant)',
 								color: 'var(--color-primary)',

@@ -113,7 +113,7 @@ export default function HomePage() {
 						className='text-headline-sm font-bold tracking-tight'
 						style={{ color: 'var(--color-primary)' }}>
 						<WaterDrop className='inline-block w-6 h-6 mr-2' />
-						AguaExpress
+						AquaFlow Manager
 					</span>
 					<nav className='hidden md:flex items-center gap-8 text-body-sm font-medium'>
 						{[
@@ -162,9 +162,9 @@ export default function HomePage() {
 					<p
 						className='text-body-lg'
 						style={{ color: 'var(--color-primary-fixed-dim)' }}>
-						AguaExpress centraliza pedidos, mantenimientos, rutas de
-						reparto y reportes en un solo panel diseñado para
-						purificadoras de agua.
+						AquaFlow Manager centraliza pedidos, mantenimientos,
+						rutas de reparto y reportes en un solo panel diseñado
+						para purificadoras de agua.
 					</p>
 					<div className='flex flex-col sm:flex-row gap-4 mt-2'>
 						<Link href='/login'>
@@ -460,7 +460,7 @@ export default function HomePage() {
 								color: 'var(--color-inverse-on-surface)',
 							}}>
 							<WaterDrop className='inline-block w-6 h-6 mr-2' />
-							AguaExpress
+							AquaFlow Manager
 						</span>
 						<p
 							className='text-body-sm'
@@ -497,7 +497,7 @@ export default function HomePage() {
 					<p
 						className='text-body-sm'
 						style={{ color: 'var(--color-outline)' }}>
-						© {new Date().getFullYear()} AguaExpress. Todos los
+						© {new Date().getFullYear()} AquaFlow Manager. Todos los
 						derechos reservados.
 					</p>
 				</div>

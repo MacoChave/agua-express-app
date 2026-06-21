@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 
 export default function LoginPage() {
 	const router = useRouter();
@@ -53,7 +54,7 @@ export default function LoginPage() {
 			<Card
 				variant='default'
 				padding='none'
-				className='w-full max-w-6/12 rounded-lg overflow-hidden'>
+				className='w-full md:max-w-6/12 rounded-lg overflow-hidden'>
 				<div
 					className='px-8 py-8 border-b'
 					style={{
@@ -66,7 +67,8 @@ export default function LoginPage() {
 							href='/'
 							className='text-headline-sm font-semibold'
 							style={{ color: 'var(--color-on-primary)' }}>
-							💧 AguaExpress
+							<WaterDrop className='inline-block w-6 h-6 mr-2' />
+							AquaFlow Manager
 						</Link>
 						<StatusChip
 							status='operational'
