@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 
 export default function ResetPasswordPage() {
 	const router = useRouter();
@@ -36,7 +37,9 @@ export default function ResetPasswordPage() {
 			const data = await res.json();
 
 			if (!res.ok) {
-				throw new Error(data.error || 'Error al actualizar la contraseña');
+				throw new Error(
+					data.error || 'Error al actualizar la contraseña',
+				);
 			}
 
 			setSuccess(true);
@@ -73,7 +76,8 @@ export default function ResetPasswordPage() {
 							href='/'
 							className='text-headline-sm font-semibold'
 							style={{ color: 'var(--color-on-primary)' }}>
-							💧 AguaExpress
+							<WaterDrop className='inline-block w-6 h-6 mr-2' />
+							AquaFlow Manager
 						</Link>
 						<StatusChip
 							status='info'
@@ -101,7 +105,8 @@ export default function ResetPasswordPage() {
 					)}
 					{success && (
 						<div className='mb-6 p-4 rounded-lg bg-primary-container text-on-primary-container text-body-sm'>
-							Contraseña actualizada con éxito. Serás redirigido al login en unos segundos.
+							Contraseña actualizada con éxito. Serás redirigido
+							al login en unos segundos.
 						</div>
 					)}
 					{!success && (
@@ -125,7 +130,9 @@ export default function ResetPasswordPage() {
 							/>
 
 							<Button type='submit' fullWidth loading={loading}>
-								{loading ? 'Actualizando...' : 'Actualizar contraseña'}
+								{loading
+									? 'Actualizando...'
+									: 'Actualizar contraseña'}
 							</Button>
 						</form>
 					)}

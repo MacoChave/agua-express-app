@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 
 export default function ForgotPasswordPage() {
 	const [loading, setLoading] = useState(false);
@@ -49,7 +50,7 @@ export default function ForgotPasswordPage() {
 			<Card
 				variant='default'
 				padding='none'
-				className='w-full max-w-6/12 rounded-lg overflow-hidden'>
+				className='w-full md:max-w-6/12 rounded-lg overflow-hidden'>
 				<div
 					className='px-8 py-8 border-b'
 					style={{
@@ -62,7 +63,8 @@ export default function ForgotPasswordPage() {
 							href='/'
 							className='text-headline-sm font-semibold'
 							style={{ color: 'var(--color-on-primary)' }}>
-							💧 AguaExpress
+							<WaterDrop className='inline-block w-6 h-6 mr-2' />
+							AquaFlow Manager
 						</Link>
 						<StatusChip
 							status='info'
@@ -91,7 +93,8 @@ export default function ForgotPasswordPage() {
 					)}
 					{success && (
 						<div className='mb-6 p-4 rounded-lg bg-primary-container text-on-primary-container text-body-sm'>
-							Se ha enviado un enlace de recuperación a tu correo electrónico.
+							Se ha enviado un enlace de recuperación a tu correo
+							electrónico.
 						</div>
 					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
@@ -107,7 +110,9 @@ export default function ForgotPasswordPage() {
 						/>
 
 						<Button type='submit' fullWidth loading={loading}>
-							{loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+							{loading
+								? 'Enviando...'
+								: 'Enviar enlace de recuperación'}
 						</Button>
 					</form>
 
