@@ -67,7 +67,7 @@ export default function MainLayout({
 					.select('role')
 					.eq('id', user.id)
 					.single();
-				setIsAdmin(profile?.role === 'admin');
+				setIsAdmin((profile as any)?.role === 'admin');
 			}
 		}
 		checkRole();
