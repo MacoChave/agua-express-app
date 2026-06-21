@@ -63,12 +63,12 @@ export async function POST(request: Request) {
 			);
 		}
 
-		body.serial_number = (lastMove?.serial_number || 0) + 1;
+		body.serial_number = ((lastMove as any)?.serial_number || 0) + 1;
 	}
 
 	const { data, error } = await supabaseAgua
 		.from('inventory_movements')
-		.insert(body)
+		.insert(body as never)
 		.select()
 		.single();
 

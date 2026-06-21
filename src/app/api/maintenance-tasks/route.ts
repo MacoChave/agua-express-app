@@ -98,12 +98,12 @@ export async function POST(request: Request) {
 			);
 		}
 
-		body.serial_number = (lastTask?.serial_number || 0) + 1;
+		body.serial_number = ((lastTask as any)?.serial_number || 0) + 1;
 	}
 
 	const { data, error } = await supabase
 		.from('maintenance_tasks')
-		.insert(body)
+		.insert(body as never)
 		.select()
 		.single();
 

@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 		.eq('id', user.id)
 		.single();
 
-	if (!adminProfile || adminProfile.role !== 'admin') {
+	if (!adminProfile || (adminProfile as any).role !== 'admin') {
 		return NextResponse.json(
 			{ error: 'Only admins can create users' },
 			{ status: 403 },

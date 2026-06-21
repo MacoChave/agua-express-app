@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
 	const { data, error } = await supabase
 		.from('maintenance_schedules')
-		.insert(body)
+		.insert(body as never)
 		.select()
 		.single();
 
@@ -75,7 +75,7 @@ export async function PATCH(request: Request) {
 
 	const { data, error } = await supabase
 		.from('maintenance_schedules')
-		.update(body)
+		.update(body as never)
 		.eq('equipment_id', equipmentId)
 		.eq('company_id', companyId)
 		.eq('warehouse_id', warehouseId)
