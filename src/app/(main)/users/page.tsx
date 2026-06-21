@@ -26,7 +26,9 @@ const columns: Column<UserProfile>[] = [
 		header: 'NOMBRE COMPLETO',
 		render: (value, row) => (
 			<div className='flex flex-col'>
-				<span className='text-body-md font-semibold'>{value}</span>
+				<span className='text-body-md font-semibold'>
+					{value as string}
+				</span>
 				<span className='text-label-md text-on-surface-variant'>
 					{row.email}
 				</span>

@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
 		// Call a SECURITY DEFINER function to bypass RLS issues in the Edge runtime
 		const { data, error } = await supabase.rpc('get_profile_by_id', {
 			user_id: user.id,
-		});
+		} as any);
 
 		console.log({ userId: user.id, data, error });
 
@@ -56,13 +56,14 @@ export async function updateSession(request: NextRequest) {
 		if (data) {
 			const requestHeaders = new Headers(request.headers);
 
-			if (data.company_id) {
-				requestHeaders.set('x-company-id', data.company_id.toString());
+			const proxyData = data as any;
+			if (proxyData.company_id) {
+				requestHeaders.set('x-company-id', proxyData.company_id.toString());
 			}
-			if (data.warehouse_id) {
+			if (proxyData.warehouse_id) {
 				requestHeaders.set(
 					'x-warehouse-id',
-					data.warehouse_id.toString(),
+					proxyData.warehouse_id.toString(),
 				);
 			}
 

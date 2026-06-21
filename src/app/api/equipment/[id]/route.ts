@@ -60,7 +60,7 @@ export async function PATCH(
 
 	const { data, error } = await supabaseAgua
 		.from('equipment')
-		.update(body)
+		.update(body as never)
 		.eq('id', id)
 		.eq('company_id', companyId)
 		.eq('warehouse_id', warehouseId)

@@ -19,8 +19,8 @@ export const getSupabaseClient = (
 	schema: string = 'public',
 ): SupabaseClient<Database> => {
 	return createClient<Database>(supabaseUrl, supabaseAnonKey, {
-		db: { schema },
-	});
+		db: { schema: schema as any },
+	}) as any;
 };
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);

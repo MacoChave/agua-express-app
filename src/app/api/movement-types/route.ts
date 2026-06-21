@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
 	const { data, error } = await supabaseAgua
 		.from('movement_types')
-		.insert(body)
+		.insert(body as never)
 		.select()
 		.single();
 
