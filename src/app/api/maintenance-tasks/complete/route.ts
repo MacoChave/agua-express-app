@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 			.limit(1)
 			.single();
 
-		let currentSerialNumber = pendingTask?.serial_number;
+		let currentSerialNumber = (pendingTask as any)?.serial_number;
 
 		if (!currentSerialNumber) {
 			// Generate new serial number if none pending
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 				.limit(1)
 				.single();
 			
-			currentSerialNumber = (lastTask?.serial_number || 0) + 1;
+			currentSerialNumber = ((lastTask as any)?.serial_number || 0) + 1;
 
 			// Insert current as completed
 			const { error: insertError } = await supabase
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 					date: body.date || new Date().toISOString().split('T')[0],
 					evidence: body.evidence || null,
 					notes: body.notes || null,
-				});
+				} as never);
 				
 			if (insertError) throw insertError;
 		} else {
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 					date: body.date || new Date().toISOString().split('T')[0],
 					evidence: body.evidence || null,
 					notes: body.notes || null,
-				})
+				} as never)
 				.eq('company_id', companyId)
 				.eq('warehouse_id', warehouseId)
 				.eq('equipment_id', body.equipment_id)
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 			// 3. Schedule next maintenance
 			// Re-fetch to ensure we don't duplicate serial if concurrent (though edge cases exist, this is fine for now)
 			const currentDate = new Date(body.date || new Date().toISOString().split('T')[0]);
-			const nextDate = calculateNextDate(currentDate, schedule.frequency, schedule.period_type);
+			const nextDate = calculateNextDate(currentDate, (schedule as any).frequency, (schedule as any).period_type);
 
 			const nextSerialNumber = currentSerialNumber + 1;
 
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
 					date: nextDate.toISOString().split('T')[0],
 					evidence: null,
 					notes: null,
-				});
+				} as never);
 
 			if (nextInsertError) throw nextInsertError;
 		}

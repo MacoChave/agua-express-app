@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 	const body = await request.json();
 	const { data, error } = await supabaseAgua
 		.from('companies')
-		.insert(body)
+		.insert(body as never)
 		.select()
 		.single();
 

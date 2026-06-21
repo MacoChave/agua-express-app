@@ -33,7 +33,7 @@ export async function PATCH(
 	const body = await request.json();
 	const { data, error } = await supabaseAgua
 		.from('companies')
-		.update(body)
+		.update(body as never)
 		.eq('id', id)
 		.select()
 		.single();
