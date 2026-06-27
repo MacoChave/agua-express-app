@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     const todayStr = today.toISOString().split('T')[0];
     const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-    (dailyMovements || []).forEach(m => {
+    (dailyMovements || []).forEach((m as any)  => {
         const val = Number(m.price || 0);
         if (m.move_date === todayStr) {
             if (m.move_type === 'VENTA') todayIncome += val;
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
       
     // Group by month
     const monthlyTotals = new Map<number, number>();
-    (monthlyMovements || []).forEach(m => {
+    (monthlyMovements || []).forEach((m as any) => {
         const d = new Date(m.move_date);
         const mKey = d.getMonth();
         monthlyTotals.set(mKey, (monthlyTotals.get(mKey) || 0) + Number(m.price || 0));
@@ -136,7 +136,7 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false })
       .limit(5);
       
-    const formattedMovements = (lastMovements || []).map(m => ({
+    const formattedMovements = (lastMovements || []).map((m as any) => ({
         id: `${m.move_type}-${m.serial_number}`,
         concept: m.move_type === 'VENTA' ? 'Venta de producto' : 'Gasto registrado',
         category: m.expense_type_id || (m.move_type === 'VENTA' ? 'Ingreso' : 'Gasto General'),
