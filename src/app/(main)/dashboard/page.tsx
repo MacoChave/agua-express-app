@@ -1,101 +1,13 @@
 'use client';
 
-import {
-	Button,
-	Card,
-	DataTable,
-	InputField,
-	StatusChip,
-} from '@/components/ui';
-import type { Column } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import { Button, Card } from '@/components/ui';
 import OrderApprove from '@/assets/icons/order_approve.svg';
 import Build from '@/assets/icons/build.svg';
 import Event from '@/assets/icons/event.svg';
-import Download from '@/assets/icons/download.svg';
 import AccountBalanceWallet from '@/assets/icons/account_balance_wallet.svg';
 import TrendingUp from '@/assets/icons/trending_up.svg';
 import WaterDrop from '@/assets/icons/water_drop.svg';
-import Search from '@/assets/icons/search.svg';
-
-type Pedido = {
-	id: string;
-	cliente: string;
-	estado: 'operational' | 'pending';
-	productos: string;
-	total: number;
-};
-
-const pedidos: Pedido[] = [
-	{
-		id: 'ORD-2849',
-		cliente: 'Residencial Los Álamos',
-		estado: 'operational',
-		productos: '25x Botellón 20L, 5x Pack 500ml',
-		total: 185,
-	},
-	{
-		id: 'ORD-2850',
-		cliente: 'Gimnasio FitLife',
-		estado: 'pending',
-		productos: '10x Botellón 20L',
-		total: 60,
-	},
-];
-
-const columns: Column<Pedido>[] = [
-	{
-		key: 'cliente',
-		header: 'CLIENTE / ID',
-		render: (_value, row) => (
-			<div className='flex flex-col'>
-				<span className='text-body-md font-semibold'>
-					{row.cliente}
-				</span>
-				<span
-					className='text-label-md'
-					style={{ color: 'var(--color-on-surface-variant)' }}>
-					#{row.id}
-				</span>
-			</div>
-		),
-	},
-	{
-		key: 'estado',
-		header: 'ESTADO',
-		render: (value) => (
-			<StatusChip
-				status={(value as Pedido['estado']) ?? 'pending'}
-				label={value === 'operational' ? 'EN RUTA' : 'PENDIENTE'}
-			/>
-		),
-	},
-	{
-		key: 'productos',
-		header: 'PRODUCTOS',
-	},
-	{
-		key: 'total',
-		header: 'TOTAL',
-		align: 'right',
-		render: (value) => (
-			<span className='font-semibold'>
-				$
-				{Number(value).toLocaleString('es-MX', {
-					minimumFractionDigits: 2,
-				})}
-			</span>
-		),
-	},
-	{
-		key: 'acciones',
-		header: 'ACCIONES',
-		render: () => (
-			<button className='px-2 py-1 rounded hover:bg-surface-container'>
-				⋮
-			</button>
-		),
-	},
-];
 
 function Progress({
 	label,
@@ -120,6 +32,19 @@ function Progress({
 }
 
 export default function DashboardPage() {
+	const [dashboardData, setDashboardData] = useState<any>(null);
+
+	useEffect(() => {
+		fetch('/api/dashboard')
+			.then((res) => res.json())
+			.then((data) => {
+				setDashboardData(data);
+			})
+			.catch((err) =>
+				console.error('Failed to fetch dashboard data:', err),
+			);
+	}, []);
+
 	return (
 		<div>
 			<div className='pt-8 px-4 md:px-8 max-w-7xl mx-auto space-y-6'>
@@ -170,13 +95,31 @@ export default function DashboardPage() {
 						<div className='flex items-end justify-between'>
 							<div className='space-y-1'>
 								<span className='text-headline-xl text-primary'>
-									$12,450.00
+									$
+									{dashboardData
+										? dashboardData.sales.total.toLocaleString(
+												'es-MX',
+												{ minimumFractionDigits: 2 },
+											)
+										: '12,450.00'}
 								</span>
-								<div className='flex items-center gap-1 text-green-600 text-label-md'>
+								<div
+									className={`flex items-center gap-1 text-label-md ${dashboardData && dashboardData.sales.increase < 0 ? 'text-red-600' : 'text-green-600'}`}>
 									<span>
-										<TrendingUp className='w-5 h-5' />
+										<TrendingUp
+											className={`w-5 h-5 ${dashboardData && dashboardData.sales.increase < 0 ? 'rotate-180' : ''}`}
+										/>
 									</span>{' '}
-									+12.5% vs ayer
+									{dashboardData
+										? (dashboardData.sales.increase > 0
+												? '+'
+												: '') +
+											dashboardData.sales.increase.toFixed(
+												1,
+											) +
+											'%'
+										: '+12.5%'}{' '}
+									vs ayer
 								</div>
 							</div>
 							<div className='h-16 w-32 flex items-end gap-1'>
@@ -200,7 +143,9 @@ export default function DashboardPage() {
 								Próximo Mantenimiento
 							</span>
 							<h2 className='text-headline-sm'>
-								Filtro de Arena #4
+								{dashboardData?.maintenance
+									? dashboardData.maintenance.equipmentName
+									: 'Filtro de Arena #4'}
 							</h2>
 						</div>
 						<div className='mt-8 relative z-10'>
@@ -208,7 +153,11 @@ export default function DashboardPage() {
 								<span>
 									<Event className='w-5 h-5' />
 								</span>{' '}
-								Mañana, 09:00 AM
+								{dashboardData?.maintenance
+									? new Date(
+											dashboardData.maintenance.date,
+										).toLocaleDateString('es-MX')
+									: 'Mañana, 09:00 AM'}
 							</div>
 							<span className='inline-block px-4 py-1 bg-error text-on-error rounded-full text-label-md animate-pulse'>
 								ALERTA CRÍTICA
@@ -216,58 +165,44 @@ export default function DashboardPage() {
 						</div>
 					</Card>
 
-					<Card
-						variant='default'
-						padding='none'
-						className='md:col-span-3 lg:col-span-4 border border-surface-container overflow-hidden'>
-						<div className='px-6 py-4 flex items-center justify-between border-b border-surface-container'>
-							<h3 className='text-headline-sm text-primary'>
-								Pedidos de Hoy
-							</h3>
-							<div className='flex items-center gap-3'>
-								<div className='w-64 max-w-[50vw]'>
-									<InputField
-										as='input'
-										name='search'
-										placeholder='Buscar cliente...'
-									/>
-								</div>
-								<button className='p-2 hover:bg-surface-container rounded transition-colors'>
-									<Search />
-								</button>
-							</div>
-						</div>
-						<div className='px-6 pb-6 pt-2'>
-							<DataTable<Pedido>
-								columns={columns}
-								data={pedidos}
-								keyField='id'
-								striped={false}
-							/>
-						</div>
-					</Card>
-
 					<div className='md:col-span-3 lg:col-span-1 space-y-6'>
-						<Card
-							variant='default'
-							padding='md'
-							className='border border-surface-container'>
-							<h4 className='text-label-md text-on-surface-variant mb-4 uppercase'>
-								Salud del Sistema
-							</h4>
-							<div className='space-y-4'>
-								<Progress
-									label='Capacidad del Tanque A'
-									value='82%'
-								/>
-								<Progress
-									label='Presión de Bombeo'
-									value='95%'
-									tone='bg-green-500'
-								/>
-							</div>
-						</Card>
-
+						{(!dashboardData || dashboardData.systemHealth) && (
+							<Card
+								variant='default'
+								padding='md'
+								className='border border-surface-container'>
+								<h4 className='text-label-md text-on-surface-variant mb-4 uppercase'>
+									Salud del Sistema
+								</h4>
+								<div className='space-y-4'>
+									{dashboardData?.systemHealth ? (
+										dashboardData.systemHealth.map(
+											(health: any, i: number) => (
+												<Progress
+													key={i}
+													label={health.label}
+													value={health.value}
+													tone={health.tone}
+												/>
+											),
+										)
+									) : (
+										<>
+											<Progress
+												label='Capacidad del Tanque A'
+												value='82%'
+											/>
+											<Progress
+												label='Presión de Bombeo'
+												value='95%'
+												tone='bg-green-500'
+											/>
+										</>
+									)}
+								</div>
+							</Card>
+						)}
+						{/* 
 						<Card
 							variant='flat'
 							padding='md'
@@ -278,13 +213,18 @@ export default function DashboardPage() {
 							<p className='text-body-sm text-on-surface-variant mb-4'>
 								Descarga el reporte semanal de purificación.
 							</p>
-							<Button variant='secondary' fullWidth>
-								<span className='text-primary'>
-									<Download className='w-5 h-5 mr-2' />
-								</span>
-								Generar PDF
-							</Button>
-						</Card>
+							<a
+								href='/api/reports/pdf'
+								download='reporte_dashboard.pdf'
+								className='block w-full'>
+								<Button variant='secondary' fullWidth>
+									<span className='text-primary'>
+										<Download className='w-5 h-5 mr-2' />
+									</span>
+									Generar PDF
+								</Button>
+							</a>
+						</Card> */}
 					</div>
 				</div>
 			</div>

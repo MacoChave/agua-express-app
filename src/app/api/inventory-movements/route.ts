@@ -4,6 +4,7 @@ import { supabaseAgua } from '@/lib/supabase';
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const moveType = searchParams.get('move_type');
+	const dateStr = searchParams.get('date');
 
 	// Get company and warehouse of headers x-warehouse-id and x-company-id
 	const warehouseId = Number(request.headers.get('x-warehouse-id'));
@@ -14,6 +15,7 @@ export async function GET(request: Request) {
 	if (companyId) query = query.eq('company_id', companyId);
 	if (warehouseId) query = query.eq('warehouse_id', warehouseId);
 	if (moveType) query = query.eq('move_type', moveType);
+	if (dateStr) query = query.eq('move_date', dateStr);
 
 	const { data, error } = await query.order('created_at', {
 		ascending: false,

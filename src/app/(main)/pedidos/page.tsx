@@ -14,11 +14,16 @@ export default function PedidosPage() {
 	const [movements, setMovements] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [pagina, setPagina] = useState(1);
+	const [fecha, setFecha] = useState(() => {
+		const today = new Date();
+		return today.toISOString().split('T')[0];
+	});
 
 	useEffect(() => {
 		async function fetchMovements() {
 			try {
-				const data = await apiClient.get<any[]>('/inventory-movements');
+				setLoading(true);
+				const data = await apiClient.get<any[]>(`/inventory-movements?date=${fecha}`);
 				setMovements(data);
 			} catch (error) {
 				console.error('Error fetching inventory movements:', error);
@@ -27,7 +32,7 @@ export default function PedidosPage() {
 			}
 		}
 		fetchMovements();
-	}, []);
+	}, [fecha]);
 
 	const stats = useMemo(() => {
 		let totalSales = 0;
@@ -76,12 +81,25 @@ export default function PedidosPage() {
 							Registro general de ventas y gastos de la bodega.
 						</p>
 					</div>
-					<Link href='/anadir-pedido'>
-						<Button>
-							<Add className='w-4 h-4 mr-2' /> Añadir Venta /
-							Gasto
-						</Button>
-					</Link>
+					<div className='flex flex-wrap items-center gap-4'>
+						<input 
+							type="date" 
+							value={fecha}
+							onChange={(e) => setFecha(e.target.value)}
+							className="px-3 py-2 border rounded-md text-body-md"
+							style={{ 
+								borderColor: 'var(--color-outline-variant)', 
+								backgroundColor: 'var(--color-surface)', 
+								color: 'var(--color-on-surface)' 
+							}}
+						/>
+						<Link href='/anadir-pedido'>
+							<Button>
+								<Add className='w-4 h-4 mr-2' /> Añadir Venta /
+								Gasto
+							</Button>
+						</Link>
+					</div>
 				</div>
 
 				{/* ── Tarjetas de estadísticas ──────────────── */}

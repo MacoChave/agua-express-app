@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const equipmentId = searchParams.get('equipment_id');
+	const startDateStr = searchParams.get('startDate');
+	const endDateStr = searchParams.get('endDate');
 
 	// Get company and warehouse of headers x-warehouse-id and x-company-id
 	const warehouseId = Number(request.headers.get('x-warehouse-id'));
@@ -14,6 +16,8 @@ export async function GET(request: Request) {
 	if (companyId) query = query.eq('company_id', companyId);
 	if (warehouseId) query = query.eq('warehouse_id', warehouseId);
 	if (equipmentId) query = query.eq('equipment_id', equipmentId);
+	if (startDateStr) query = query.gte('date', startDateStr);
+	if (endDateStr) query = query.lte('date', endDateStr);
 
 	const { data, error } = await query.order('date', { ascending: false });
 

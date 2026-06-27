@@ -19,11 +19,11 @@ export function cn(
 	return inputs.filter(Boolean).join(' ');
 }
 
-/** Formatea moneda en USD (es-MX) */
+/** Formatea moneda en GTQ (es-GT) */
 export function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('es-MX', {
+	return new Intl.NumberFormat('es-GT', {
 		style: 'currency',
-		currency: 'USD',
+		currency: 'GTQ',
 		minimumFractionDigits: 2,
 	}).format(Math.abs(amount));
 }
