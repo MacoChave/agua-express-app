@@ -46,7 +46,7 @@ export async function GET(request: Request) {
 
 // Cambio aplicado para datos tipo any
 
-    (dailyMovements || []).forEach(m: any => {
+    (dailyMovements || []).forEach((m: any) => {
         const val = Number(m.price || 0);
         if (m.move_date === todayStr) {
             if (m.move_type === 'VENTA') todayIncome += val;
@@ -78,7 +78,7 @@ export async function GET(request: Request) {
       
     // Group by month
     const monthlyTotals = new Map<number, number>();
-    (monthlyMovements || []).forEach(m: any => {
+    (monthlyMovements || []).forEach((m: any) => {
         const d = new Date(m.move_date);
         const mKey = d.getMonth();
         monthlyTotals.set(mKey, (monthlyTotals.get(mKey) || 0) + Number(m.price || 0));
