@@ -136,13 +136,14 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false })
       .limit(5);
       
-    const formattedMovements = (lastMovements || []).map((m as any) => ({
-        id: `${m.move_type}-${m.serial_number}`,
-        concept: m.move_type === 'VENTA' ? 'Venta de producto' : 'Gasto registrado',
-        category: m.expense_type_id || (m.move_type === 'VENTA' ? 'Ingreso' : 'Gasto General'),
-        time: new Date(m.created_at).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' }),
-        amount: m.move_type === 'VENTA' ? Number(m.price || 0) : -Number(m.price || 0),
-        icon: m.move_type === 'VENTA' ? 'payments' : 'shopping_cart'
+    // Cambiamos "m as any" por "m: any"
+    const formattedMovements = (lastMovements || []).map((m: any) => ({
+      id: `${m.move_type}-${m.serial_number}`,
+      concept: m.move_type === 'VENTA' ? 'Venta de producto' : 'Gasto registrado',
+      category: m.expense_type_id || (m.move_type === 'VENTA' ? 'Ingreso' : 'Gasto General'),
+      time: new Date(m.created_at).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' }),
+      amount: m.move_type === 'VENTA' ? Number(m.price || 0) : -Number(m.price || 0),
+      icon: m.move_type === 'VENTA' ? 'payments' : 'shopping_cart'
     }));
 
     return NextResponse.json({
