@@ -11,8 +11,8 @@ interface VentaFormProps {
 }
 
 export default function VentaForm({ onConfirm }: VentaFormProps) {
-	const [cantidad, setCantidad] = useState(50);
-	const [total, setTotal] = useState(350);
+	const [cantidad, setCantidad] = useState(0);
+	const [total, setTotal] = useState(0);
 	const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
 	const [loading, setLoading] = useState(false);
 
@@ -39,6 +39,10 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 			setLoading(false);
 		}
 	};
+
+	function isDataValidate(): boolean | undefined {
+		return cantidad > 0 && total > 0 && fecha !== '';
+	}
 
 	return (
 		<div className='space-y-6'>
@@ -85,7 +89,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 							</button>
 							<input
 								type='number'
-								value={cantidad}
+								value={cantidad === 0 ? '' : cantidad}
 								onChange={(e) =>
 									setCantidad(
 										Math.max(
@@ -120,7 +124,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 						</label>
 						<input
 							type='number'
-							value={total}
+							value={total === 0 ? '' : total}
 							onChange={(e) => {
 								const val = Math.max(
 									1,
@@ -149,7 +153,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 							type='date'
 							value={fecha}
 							onChange={(e) => setFecha(e.target.value)}
-							className='w-full border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
+							className='px-4 w-full border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
 							style={{
 								borderColor: 'var(--color-outline-variant)',
 								color: 'var(--color-primary)',
@@ -162,7 +166,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 			{/* ── Botón confirmar ─────────────────────── */}
 			<button
 				onClick={handleSave}
-				disabled={loading}
+				disabled={loading || !isDataValidate()}
 				className='w-full h-16 rounded-xl text-headline-md font-semibold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70'
 				style={{
 					backgroundColor: 'var(--color-primary-container)',
