@@ -74,8 +74,8 @@ export async function GET() {
         increase: salesIncrease,
       },
       maintenance: nextMaintenance ? {
-        equipmentName: `Equipo #${nextMaintenance.equipment_id}`,
-        date: nextMaintenance.date,
+        equipmentName: `Equipo #${(nextMaintenance as any).equipment_id}`,
+        date: (nextMaintenance as any).date,
       } : null,
       systemHealth,
     });
