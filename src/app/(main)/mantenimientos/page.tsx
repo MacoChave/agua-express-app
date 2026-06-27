@@ -18,11 +18,25 @@ export default function MantenimientosPage() {
 	const [scheduleOpen, setScheduleOpen] = useState(false);
 	const [tasks, setTasks] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [dateRange, setDateRange] = useState(() => {
+		const today = new Date();
+		const day = today.getDay();
+		const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+		const monday = new Date(today);
+		monday.setDate(diff);
+		const sunday = new Date(monday);
+		sunday.setDate(monday.getDate() + 6);
+		return {
+			startDate: monday.toISOString().split('T')[0],
+			endDate: sunday.toISOString().split('T')[0]
+		};
+	});
 
 	useEffect(() => {
 		async function fetchTasks() {
 			try {
-				const data = await apiClient.get<any[]>('/maintenance-tasks');
+				setLoading(true);
+				const data = await apiClient.get<any[]>(`/maintenance-tasks?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
 				setTasks(data);
 			} catch (error) {
 				console.error('Error fetching maintenance tasks:', error);
@@ -31,7 +45,7 @@ export default function MantenimientosPage() {
 			}
 		}
 		fetchTasks();
-	}, [modalOpen, scheduleOpen]); // Refresh when modals close
+	}, [modalOpen, scheduleOpen, dateRange.startDate, dateRange.endDate]); // Refresh when modals close or date changes
 
 	return (
 		<>
@@ -143,14 +157,42 @@ export default function MantenimientosPage() {
 					<div className='lg:col-span-8'>
 						<div className='bg-[var(--color-surface-container-lowest)] rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] overflow-hidden'>
 							{/* Table Header */}
-							<div className='p-6 border-b border-[var(--color-outline-variant)] flex justify-between items-center bg-white'>
+							<div className='p-6 border-b border-[var(--color-outline-variant)] flex flex-wrap justify-between items-center gap-4 bg-white'>
 								<h3 className='text-headline-sm font-semibold text-[var(--color-on-surface)]'>
 									Tareas Recientes
 								</h3>
-								<button className='text-[var(--color-primary)] text-label-md font-medium flex items-center gap-1 hover:underline'>
-									Ver historial completo
-									<ArrowForward className='w-4 h-4' />
-								</button>
+								<div className="flex items-center gap-4">
+									<div className="flex items-center gap-2">
+										<span className="text-label-md text-[var(--color-on-surface-variant)] hidden sm:inline">Desde:</span>
+										<input 
+											type="date" 
+											value={dateRange.startDate}
+											onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+											className="px-3 py-1 border rounded-md text-body-md"
+											style={{ 
+												borderColor: 'var(--color-outline-variant)', 
+												backgroundColor: 'var(--color-surface)', 
+												color: 'var(--color-on-surface)' 
+											}}
+										/>
+										<span className="text-label-md text-[var(--color-on-surface-variant)] hidden sm:inline">Hasta:</span>
+										<input 
+											type="date" 
+											value={dateRange.endDate}
+											onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+											className="px-3 py-1 border rounded-md text-body-md"
+											style={{ 
+												borderColor: 'var(--color-outline-variant)', 
+												backgroundColor: 'var(--color-surface)', 
+												color: 'var(--color-on-surface)' 
+											}}
+										/>
+									</div>
+									<button className='text-[var(--color-primary)] text-label-md font-medium flex items-center gap-1 hover:underline'>
+										Ver historial completo
+										<ArrowForward className='w-4 h-4' />
+									</button>
+								</div>
 							</div>
 
 							{/* Task List */}

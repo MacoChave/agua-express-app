@@ -5,7 +5,6 @@ import { Button, Card } from '@/components/ui';
 import OrderApprove from '@/assets/icons/order_approve.svg';
 import Build from '@/assets/icons/build.svg';
 import Event from '@/assets/icons/event.svg';
-import Download from '@/assets/icons/download.svg';
 import AccountBalanceWallet from '@/assets/icons/account_balance_wallet.svg';
 import TrendingUp from '@/assets/icons/trending_up.svg';
 import WaterDrop from '@/assets/icons/water_drop.svg';
