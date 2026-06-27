@@ -68,7 +68,9 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 
 				if (uploadError) {
 					console.error('Error uploading file:', uploadError);
-					alert('Error al subir la evidencia. Por favor intente de nuevo.');
+					alert(
+						'Error al subir la evidencia. Por favor intente de nuevo.',
+					);
 					setLoading(false);
 					return;
 				}
@@ -156,7 +158,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						onChange={(e) => setMonto(e.target.value)}
 						leadingIcon={
 							<span className='text-body-md font-semibold'>
-								$
+								Q
 							</span>
 						}
 					/>
