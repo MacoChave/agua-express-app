@@ -105,7 +105,7 @@ export async function GET(request: Request) {
       
     const expenseMap = new Map<string, number>();
     let totalMonthlyExpenses = 0;
-    (expenses || []).forEach(e: any => {
+    (expenses || []).forEach((e: any) => {
         const cat = e.expense_type_id || 'Otros';
         const val = Number(e.price || 0);
         expenseMap.set(cat, (expenseMap.get(cat) || 0) + val);
