@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     const todayStr = today.toISOString().split('T')[0];
     const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-// Cambio aplicado
+// Cambio aplicado para datos tipo any
 
     (dailyMovements || []).forEach(m: any => {
         const val = Number(m.price || 0);
