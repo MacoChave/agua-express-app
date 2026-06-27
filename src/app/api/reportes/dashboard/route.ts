@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     const todayStr = today.toISOString().split('T')[0];
     const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-    (dailyMovements || []).forEach((m as any)  => {
+    (dailyMovements || []).forEach(m: any => {
         const val = Number(m.price || 0);
         if (m.move_date === todayStr) {
             if (m.move_type === 'VENTA') todayIncome += val;
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
       
     // Group by month
     const monthlyTotals = new Map<number, number>();
-    (monthlyMovements || []).forEach((m as any) => {
+    (monthlyMovements || []).forEach(m: any => {
         const d = new Date(m.move_date);
         const mKey = d.getMonth();
         monthlyTotals.set(mKey, (monthlyTotals.get(mKey) || 0) + Number(m.price || 0));
@@ -103,7 +103,7 @@ export async function GET(request: Request) {
       
     const expenseMap = new Map<string, number>();
     let totalMonthlyExpenses = 0;
-    (expenses || []).forEach(e => {
+    (expenses || []).forEach(e: any => {
         const cat = e.expense_type_id || 'Otros';
         const val = Number(e.price || 0);
         expenseMap.set(cat, (expenseMap.get(cat) || 0) + val);
