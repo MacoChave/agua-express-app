@@ -40,8 +40,8 @@ export async function GET() {
       .gte('created_at', yesterday.toISOString())
       .lt('created_at', today.toISOString());
 
-    const todayTotal = todayOrders?.reduce((acc, order) => acc + Number(order.total), 0) || 0;
-    const yesterdayTotal = yesterdayOrders?.reduce((acc, order) => acc + Number(order.total), 0) || 0;
+    const todayTotal = todayOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
+    const yesterdayTotal = yesterdayOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
     const salesIncrease = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : (todayTotal > 0 ? 100 : 0);
 
     // 2. Próximo mantenimiento
