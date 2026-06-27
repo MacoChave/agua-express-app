@@ -12,7 +12,7 @@ export async function GET() {
 
     // Get user's company
     const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', user.id).single();
-    const companyId = (profile as any)?.company_id;
+    const companyId = (profile as any)?.company_id ?? null;
 
     if (!companyId) {
       return NextResponse.json({ error: 'No company found' }, { status: 400 });
