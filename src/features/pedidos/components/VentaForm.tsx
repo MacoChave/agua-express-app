@@ -5,6 +5,7 @@ import Remove from '@/assets/icons/remove.svg';
 import Add from '@/assets/icons/add.svg';
 import Save from '@/assets/icons/save.svg';
 import { apiClient } from '@/lib/apiClient';
+import { Button, InputField } from '@/components/ui';
 
 interface VentaFormProps {
 	onConfirm: () => void;
@@ -65,80 +66,47 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 
 				<div className='grid grid-cols-2 gap-4'>
 					{/* Total garrafones */}
-					<div className='space-y-1'>
-						<label
-							className='text-label-md font-medium'
-							style={{
-								color: 'var(--color-on-surface-variant)',
-							}}>
-							Total garrafones
-						</label>
-						<div
-							className='flex items-center border rounded-xl overflow-hidden h-12'
-							style={{
-								borderColor: 'var(--color-outline-variant)',
-							}}>
-							<button
-								type='button'
-								onClick={() => handleCantidad(-1)}
-								className='w-12 h-full flex items-center justify-center transition-colors hover:bg-surface-container-low active:bg-surface-container'
-								style={{
-									color: 'var(--color-on-surface)',
-								}}>
+					<InputField
+						type='number'
+						value={cantidad === 0 ? '' : cantidad}
+						onChange={(e) => {
+							let val = parseInt(e.target.value);
+							if (!isNaN(val) && val > 0) setCantidad(val);
+							else setCantidad(0);
+						}}
+						label='Total garrafones'
+						placeholder='50'
+						leftAction={
+							<Button
+								variant='ghost'
+								onClick={() => handleCantidad(-1)}>
 								<Remove className='w-5 h-5' />
-							</button>
-							<input
-								type='number'
-								value={cantidad === 0 ? '' : cantidad}
-								onChange={(e) =>
-									setCantidad(
-										Math.max(
-											1,
-											parseInt(e.target.value) || 1,
-										),
-									)
-								}
-								className='w-full text-center border-none focus:ring-0 bg-transparent text-headline-sm font-semibold'
-								style={{ color: 'var(--color-primary)' }}
-							/>
-							<button
-								type='button'
-								onClick={() => handleCantidad(1)}
-								className='w-12 h-full flex items-center justify-center transition-colors hover:bg-surface-container-low active:bg-surface-container'
-								style={{
-									color: 'var(--color-on-surface)',
-								}}>
+							</Button>
+						}
+						rightAction={
+							<Button
+								variant='ghost'
+								onClick={() => handleCantidad(1)}>
 								<Add className='w-5 h-5' />
-							</button>
-						</div>
-					</div>
+							</Button>
+						}
+						fullWidth
+					/>
 
 					{/* Ingreso total */}
-					<div className='space-y-1'>
-						<label
-							className='text-label-md font-medium'
-							style={{
-								color: 'var(--color-on-surface-variant)',
-							}}>
-							Ingreso total
-						</label>
-						<input
-							type='number'
-							value={total === 0 ? '' : total}
-							onChange={(e) => {
-								const val = Math.max(
-									1,
-									parseInt(e.target.value) || 1,
-								);
-								setTotal(val);
-							}}
-							className='w-full text-center border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
-							style={{
-								borderColor: 'var(--color-outline-variant)',
-								color: 'var(--color-primary)',
-							}}
-						/>
-					</div>
+					<InputField
+						type='number'
+						value={total === 0 ? '' : total}
+						onChange={(e) => {
+							let val = parseInt(e.target.value);
+							if (!isNaN(val) && val > 0) setTotal(val);
+							else setTotal(0);
+						}}
+						label='Ingreso total'
+						placeholder='350'
+						prefixIcon='Q'
+						fullWidth
+					/>
 
 					{/* Fecha de movimiento */}
 					<div className='space-y-1 col-span-2'>

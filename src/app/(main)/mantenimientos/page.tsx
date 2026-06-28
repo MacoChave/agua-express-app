@@ -1,6 +1,9 @@
 'use client';
 
-import { NewMaintenanceModal, StatusBadge } from '@/features/mantenimientos/components/NewMaintenance';
+import {
+	NewMaintenanceModal,
+	StatusBadge,
+} from '@/features/mantenimientos/components/NewMaintenance';
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/apiClient';
 
@@ -11,6 +14,10 @@ import Event from '@/assets/icons/event.svg';
 import MoreVert from '@/assets/icons/more_vert.svg';
 import Notifications from '@/assets/icons/notifications.svg';
 import { ProgramarMantenimiento } from '@/features/mantenimientos/components/ProgramarMantenimiento';
+import DatePicker, {
+	DatePickerValue,
+} from '@/components/ui/DatePicker/DatePicker';
+import { formatToAPIDate } from '@/lib/utils';
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function MantenimientosPage() {
@@ -28,15 +35,21 @@ export default function MantenimientosPage() {
 		sunday.setDate(monday.getDate() + 6);
 		return {
 			startDate: monday.toISOString().split('T')[0],
-			endDate: sunday.toISOString().split('T')[0]
+			endDate: sunday.toISOString().split('T')[0],
 		};
 	});
+
+	const toDateString = (value: string | Date | null) => {
+		return formatToAPIDate(value);
+	};
 
 	useEffect(() => {
 		async function fetchTasks() {
 			try {
 				setLoading(true);
-				const data = await apiClient.get<any[]>(`/maintenance-tasks?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`);
+				const data = await apiClient.get<any[]>(
+					`/maintenance-tasks?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
+				);
 				setTasks(data);
 			} catch (error) {
 				console.error('Error fetching maintenance tasks:', error);
@@ -155,39 +168,38 @@ export default function MantenimientosPage() {
 
 					{/* ── Right Column ────────────────────── */}
 					<div className='lg:col-span-8'>
-						<div className='bg-[var(--color-surface-container-lowest)] rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)] overflow-hidden'>
+						<div className='bg-[var(--color-surface-container-lowest)] rounded-xl shadow-[0_4px_12px_rgba(0,77,122,0.08)]'>
 							{/* Table Header */}
 							<div className='p-6 border-b border-[var(--color-outline-variant)] flex flex-wrap justify-between items-center gap-4 bg-white'>
 								<h3 className='text-headline-sm font-semibold text-[var(--color-on-surface)]'>
 									Tareas Recientes
 								</h3>
-								<div className="flex items-center gap-4">
-									<div className="flex items-center gap-2">
-										<span className="text-label-md text-[var(--color-on-surface-variant)] hidden sm:inline">Desde:</span>
-										<input 
-											type="date" 
-											value={dateRange.startDate}
-											onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-											className="px-3 py-1 border rounded-md text-body-md"
-											style={{ 
-												borderColor: 'var(--color-outline-variant)', 
-												backgroundColor: 'var(--color-surface)', 
-												color: 'var(--color-on-surface)' 
-											}}
-										/>
-										<span className="text-label-md text-[var(--color-on-surface-variant)] hidden sm:inline">Hasta:</span>
-										<input 
-											type="date" 
-											value={dateRange.endDate}
-											onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-											className="px-3 py-1 border rounded-md text-body-md"
-											style={{ 
-												borderColor: 'var(--color-outline-variant)', 
-												backgroundColor: 'var(--color-surface)', 
-												color: 'var(--color-on-surface)' 
-											}}
-										/>
-									</div>
+								<div className='flex items-center gap-4'>
+									<DatePicker
+										mode='date'
+										selectionType='range'
+										placeholder='Selecciona las fechas'
+										value={[
+											dateRange.startDate,
+											dateRange.endDate,
+										]}
+										onChange={(e: DatePickerValue) => {
+											console.log(e);
+
+											if (!Array.isArray(e)) return;
+
+											const [start, end] = e;
+											let startDate = toDateString(start);
+											let endDate = toDateString(end);
+
+											if (startDate && endDate)
+												setDateRange({
+													startDate,
+													endDate,
+												});
+										}}
+									/>
+
 									<button className='text-[var(--color-primary)] text-label-md font-medium flex items-center gap-1 hover:underline'>
 										Ver historial completo
 										<ArrowForward className='w-4 h-4' />
@@ -211,18 +223,29 @@ export default function MantenimientosPage() {
 										// o si la fecha es en el futuro.
 										const taskDate = new Date(task.date);
 										const today = new Date();
-										let inferredStatus: 'completed' | 'pending' | 'in-progress' = 'pending';
-										
-										if (task.evidence || task.notes || taskDate <= today) {
+										let inferredStatus:
+											| 'completed'
+											| 'pending'
+											| 'in-progress' = 'pending';
+
+										if (
+											task.evidence ||
+											task.notes ||
+											taskDate <= today
+										) {
 											inferredStatus = 'completed';
 											// Si la fecha es pasada o de hoy y NO tiene notas/evidencia, asumiremos que se completó igual para no dejarlo colgado, o podríamos usar 'pending' si prefieren. Por ahora usaremos la lógica: si tiene evidencia o notas, o si la fecha ya pasó, está completed.
 											// Ajuste fino: si no tiene notas ni evidencia, y es a futuro, pending.
-											if (!task.evidence && !task.notes && taskDate > today) {
+											if (
+												!task.evidence &&
+												!task.notes &&
+												taskDate > today
+											) {
 												inferredStatus = 'pending';
 											}
 										}
 
-										const title = task.equipment?.name 
+										const title = task.equipment?.name
 											? `${task.maintenance_types?.name || 'Mantenimiento'} - ${task.equipment.name}`
 											: `Tarea #${task.serial_number}`;
 
@@ -237,7 +260,17 @@ export default function MantenimientosPage() {
 															{title}
 														</h4>
 														<p className='text-body-sm text-[var(--color-on-surface-variant)]'>
-															Fecha: {new Date(task.date).toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' })}
+															Fecha:{' '}
+															{new Date(
+																task.date,
+															).toLocaleDateString(
+																'es-GT',
+																{
+																	day: '2-digit',
+																	month: 'short',
+																	year: 'numeric',
+																},
+															)}
 														</p>
 													</div>
 												</div>
@@ -251,11 +284,13 @@ export default function MantenimientosPage() {
 														</p>
 														<span
 															className={`font-bold text-body-sm ${
-																inferredStatus === 'completed'
+																inferredStatus ===
+																'completed'
 																	? 'text-green-600'
 																	: 'text-[var(--color-error)]'
 															}`}>
-															{inferredStatus === 'completed'
+															{inferredStatus ===
+															'completed'
 																? 'Completado'
 																: 'Pendiente'}
 														</span>
@@ -263,7 +298,9 @@ export default function MantenimientosPage() {
 													{/* Mobile: badge */}
 													<div className='md:hidden'>
 														<StatusBadge
-															status={inferredStatus}
+															status={
+																inferredStatus
+															}
 														/>
 													</div>
 													<button className='p-2 hover:bg-[var(--color-surface-variant)] rounded-full transition-all'>
