@@ -7,6 +7,9 @@ import { apiClient } from '@/lib/apiClient';
 import Add from '@/assets/icons/add.svg';
 import ArrowLeft from '@/assets/icons/arrow_left.svg';
 import ArrowRight from '@/assets/icons/arrow_right.svg';
+import DatePicker, {
+	DatePickerValue,
+} from '@/components/ui/DatePicker/DatePicker';
 
 const PAGE_SIZE = 10;
 
@@ -23,7 +26,9 @@ export default function PedidosPage() {
 		async function fetchMovements() {
 			try {
 				setLoading(true);
-				const data = await apiClient.get<any[]>(`/inventory-movements?date=${fecha}`);
+				const data = await apiClient.get<any[]>(
+					`/inventory-movements?date=${fecha}`,
+				);
 				setMovements(data);
 			} catch (error) {
 				console.error('Error fetching inventory movements:', error);
@@ -81,8 +86,21 @@ export default function PedidosPage() {
 							Registro general de ventas y gastos de la bodega.
 						</p>
 					</div>
+
 					<div className='flex flex-wrap items-center gap-4'>
-						<input 
+						<DatePicker
+							mode='date'
+							selectionType='single'
+							value={new Date(fecha)}
+							placeholder='Selecciona una fecha'
+							onChange={(e: DatePickerValue) => {
+								if (e instanceof Date) {
+									setFecha(e.toISOString().split('T')[0]);
+								}
+							}}
+						/>
+
+						{/* <input 
 							type="date" 
 							value={fecha}
 							onChange={(e) => setFecha(e.target.value)}
@@ -92,7 +110,7 @@ export default function PedidosPage() {
 								backgroundColor: 'var(--color-surface)', 
 								color: 'var(--color-on-surface)' 
 							}}
-						/>
+						/> */}
 						<Link href='/anadir-pedido'>
 							<Button>
 								<Add className='w-4 h-4 mr-2' /> Añadir Venta /

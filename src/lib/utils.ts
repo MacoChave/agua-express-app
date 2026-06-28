@@ -12,6 +12,8 @@
 //   return twMerge(clsx(inputs));
 // }
 
+import dayjs from 'dayjs';
+
 /** Concatenador de clases condicional sin dependencias externas */
 export function cn(
 	...inputs: (string | undefined | null | false | 0)[]
@@ -28,7 +30,24 @@ export function formatCurrency(amount: number): string {
 	}).format(Math.abs(amount));
 }
 
+/** Formatea fecha en GTQ (es-GT) */
+export function formatDate(date: Date | string): string {
+	return new Intl.DateTimeFormat('es-GT', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).format(new Date(date));
+}
+
 /** Retorna la fecha actual en formato ISO (YYYY-MM-DD) */
 export function todayISO(): string {
 	return new Date().toISOString().split('T')[0];
+}
+
+/**
+ * Convierte una fecha a formato estándar YYYY-MM-DD para uso en APIs y backend
+ */
+export function formatToAPIDate(date: Date | string | null): string | null {
+	if (!date) return null;
+	return dayjs(date).format('YYYY-MM-DD');
 }
