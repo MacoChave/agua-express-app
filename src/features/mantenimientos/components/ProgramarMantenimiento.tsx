@@ -12,6 +12,8 @@ import Close from '@/assets/icons/close.svg';
 import Event from '@/assets/icons/event.svg';
 import Build from '@/assets/icons/build.svg';
 import KeyboardArrowDown from '@/assets/icons/keyboard_arrow_down.svg';
+import Remove from '@/assets/icons/remove.svg';
+import Add from '@/assets/icons/add.svg';
 
 export interface ProgramarMantenimientoProps {
 	isOpen: boolean;
@@ -99,6 +101,13 @@ export function ProgramarMantenimiento({
 		} finally {
 			setSubmitting(false);
 		}
+	};
+
+	const handleQuantity = (delta: number) => {
+		setForm((prev) => ({
+			...prev,
+			quantity: Math.max(1, prev.quantity + delta),
+		}));
 	};
 
 	return (
@@ -229,6 +238,22 @@ export function ProgramarMantenimiento({
 								type='number'
 								value={form.quantity}
 								onChange={handleChange}
+								leftAction={
+									<Button
+										variant='ghost'
+										type='button'
+										onClick={() => handleQuantity(-1)}>
+										<Remove className='w-5 h-5' />
+									</Button>
+								}
+								rightAction={
+									<Button
+										variant='ghost'
+										type='button'
+										onClick={() => handleQuantity(1)}>
+										<Add className='w-5 h-5' />
+									</Button>
+								}
 								required
 							/>
 							<div className='space-y-1'>

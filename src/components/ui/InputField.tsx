@@ -13,8 +13,10 @@ interface InputFieldProps
 		BaseFieldProps,
 		Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
 	as?: 'input';
+	leftAction?: React.ReactNode;
 	prefixIcon?: React.ReactNode;
 	suffixIcon?: React.ReactNode;
+	rightAction?: React.ReactNode;
 }
 
 interface TextareaFieldProps
@@ -29,10 +31,11 @@ interface TextareaFieldProps
 type FieldProps = InputFieldProps | TextareaFieldProps;
 
 const inputBase = [
-	'w-full text-center border rounded-md',
-	'h-10 text-headline-sm font-semibold',
+	'w-full text-left',
+	'h-10 px-4 text-headline-sm font-semibold',
 	'text-[var(--color-primary)]',
-	'bg-[var(--color-surface-bright)]',
+	'[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+	'focus:outline-none focus:ring-0',
 ].join(' ');
 
 const inputError = [
@@ -112,8 +115,10 @@ const InputField = forwardRef<
 		error: _e,
 		fullWidth: _fw,
 		className: _cls,
-		prefixIcon: startIcon,
-		suffixIcon: endIcon,
+		prefixIcon: prefixIcon,
+		suffixIcon: suffixIcon,
+		leftAction: leftAction,
+		rightAction: rightAction,
 		...rest
 	} = props as InputFieldProps;
 
@@ -129,10 +134,11 @@ const InputField = forwardRef<
 					{label}
 				</label>
 			)}
-			<div className='relative flex items-center'>
-				{startIcon && (
+			<div className='relative flex items-center bg-[var(--color-surface-bright)] border border-[var(--color-outline-variant)] rounded-md'>
+				{leftAction && leftAction}
+				{prefixIcon && (
 					<span className='absolute left-3 text-[var(--color-primary)] pointer-events-none'>
-						{startIcon}
+						{prefixIcon}
 					</span>
 				)}
 				<input
@@ -141,8 +147,8 @@ const InputField = forwardRef<
 					className={[
 						inputBase,
 						hasError ? inputError : '',
-						startIcon ? 'pl-9' : '',
-						endIcon ? 'pr-9' : '',
+						prefixIcon ? 'pl-9' : '',
+						suffixIcon ? 'pr-9' : '',
 					]
 						.filter(Boolean)
 						.join(' ')}
@@ -152,11 +158,12 @@ const InputField = forwardRef<
 					aria-invalid={hasError}
 					{...rest}
 				/>
-				{endIcon && (
+				{suffixIcon && (
 					<span className='absolute right-3 text-[var(--color-primary)] pointer-events-none'>
-						{endIcon}
+						{suffixIcon}
 					</span>
 				)}
+				{rightAction && rightAction}
 			</div>
 			{(hint || error) && (
 				<p
