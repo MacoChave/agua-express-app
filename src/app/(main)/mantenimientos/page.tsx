@@ -6,7 +6,6 @@ import {
 } from '@/features/mantenimientos/components/NewMaintenance';
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/apiClient';
-import dayjs from 'dayjs';
 
 import AddCircle from '@/assets/icons/add_circle.svg';
 import ArrowForward from '@/assets/icons/arrow_forward.svg';
@@ -17,9 +16,8 @@ import Notifications from '@/assets/icons/notifications.svg';
 import { ProgramarMantenimiento } from '@/features/mantenimientos/components/ProgramarMantenimiento';
 import DatePicker, {
 	DatePickerValue,
-	RangeValue,
 } from '@/components/ui/DatePicker/DatePicker';
-import { formatDate, formatToAPIDate } from '@/lib/utils';
+import { formatToAPIDate } from '@/lib/utils';
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function MantenimientosPage() {

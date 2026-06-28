@@ -39,11 +39,6 @@ export function formatDate(date: Date | string): string {
 	}).format(new Date(date));
 }
 
-/** Retorna la fecha actual en formato ISO (YYYY-MM-DD) */
-export function todayISO(): string {
-	return new Date().toISOString().split('T')[0];
-}
-
 /**
  * Convierte una fecha a formato estándar YYYY-MM-DD para uso en APIs y backend
  */
