@@ -8,6 +8,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	size?: ButtonSize;
 	loading?: boolean;
 	fullWidth?: boolean;
+	leftIcon?: React.ReactNode;
+	rightIcon?: React.ReactNode;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -35,6 +37,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 			disabled,
 			className = '',
 			children,
+			leftIcon = null,
+			rightIcon = null,
 			...props
 		},
 		ref,
@@ -64,7 +68,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 						aria-hidden='true'
 					/>
 				)}
+				{leftIcon && !loading && leftIcon}
 				{children}
+				{rightIcon && !loading && rightIcon}
 			</button>
 		);
 	},
