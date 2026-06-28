@@ -80,18 +80,20 @@ const InputField = forwardRef<
 						{label}
 					</label>
 				)}
-				<textarea
-					ref={ref as React.Ref<HTMLTextAreaElement>}
-					id={fieldId}
-					className={[inputBase, hasError ? inputError : '']
-						.filter(Boolean)
-						.join(' ')}
-					aria-describedby={
-						hint || error ? `${fieldId}-helper` : undefined
-					}
-					aria-invalid={hasError}
-					{...rest}
-				/>
+				<div className='relative flex items-center bg-[var(--color-surface-bright)] border border-[var(--color-outline-variant)] rounded-md'>
+					<textarea
+						ref={ref as React.Ref<HTMLTextAreaElement>}
+						id={fieldId}
+						className={[inputBase, hasError ? inputError : '']
+							.filter(Boolean)
+							.join(' ')}
+						aria-describedby={
+							hint || error ? `${fieldId}-helper` : undefined
+						}
+						aria-invalid={hasError}
+						{...rest}
+					/>
+				</div>
 				{(hint || error) && (
 					<p
 						id={`${fieldId}-helper`}
