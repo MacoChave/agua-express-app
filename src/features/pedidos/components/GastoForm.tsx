@@ -156,7 +156,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						placeholder='0.00'
 						value={monto}
 						onChange={(e) => setMonto(e.target.value)}
-						leadingIcon={
+						prefixIcon={
 							<span className='text-body-md font-semibold'>
 								Q
 							</span>

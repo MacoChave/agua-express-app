@@ -165,7 +165,7 @@ export default function UsersPage() {
 							id='search'
 							name='search'
 							placeholder='Buscar por nombre...'
-							leadingIcon={<Search className='w-5 h-5' />}
+							prefixIcon={<Search className='w-5 h-5' />}
 						/>
 					</div>
 				</div>

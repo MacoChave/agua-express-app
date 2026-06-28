@@ -13,8 +13,8 @@ interface InputFieldProps
 		BaseFieldProps,
 		Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
 	as?: 'input';
-	leadingIcon?: React.ReactNode;
-	trailingIcon?: React.ReactNode;
+	prefixIcon?: React.ReactNode;
+	suffixIcon?: React.ReactNode;
 }
 
 interface TextareaFieldProps
@@ -22,19 +22,17 @@ interface TextareaFieldProps
 		BaseFieldProps,
 		Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> {
 	as: 'textarea';
-	leadingIcon?: never;
-	trailingIcon?: never;
+	prefixIcon?: never;
+	suffixIcon?: never;
 }
 
 type FieldProps = InputFieldProps | TextareaFieldProps;
 
 const inputBase = [
-	'w-full bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)]',
-	'border border-[var(--color-outline-variant)] rounded-[var(--radius-md)]',
-	'px-3 py-2 text-body-md placeholder:text-[var(--color-on-surface-variant)]',
-	'transition-all duration-150',
-	'focus:outline-none focus:border-[var(--color-secondary)] focus:ring-2 focus:ring-[var(--color-secondary)]/20',
-	'disabled:opacity-40 disabled:cursor-not-allowed',
+	'w-full text-center border rounded-md',
+	'h-10 text-headline-sm font-semibold',
+	'text-[var(--color-primary)]',
+	'bg-[var(--color-surface-bright)]',
 ].join(' ');
 
 const inputError = [
@@ -51,19 +49,15 @@ const InputField = forwardRef<
 	const fieldId = props.id ?? props.name;
 	const hasError = Boolean(error);
 
-	const wrapperClass = [
-		'flex flex-col gap-1',
-		fullWidth ? 'w-full' : '',
-		className,
-	]
+	const wrapperClass = ['space-y-1', fullWidth ? 'w-full' : '', className]
 		.filter(Boolean)
 		.join(' ');
 
 	if (props.as === 'textarea') {
 		const {
 			as: _as,
-			leadingIcon: _l,
-			trailingIcon: _t,
+			prefixIcon: _l,
+			suffixIcon: _r,
 			label: _lb,
 			hint: _h,
 			error: _e,
@@ -76,7 +70,10 @@ const InputField = forwardRef<
 				{label && (
 					<label
 						htmlFor={fieldId}
-						className='text-label-md text-[var(--color-on-surface-variant)]'>
+						className='text-label-md font-medium'
+						style={{
+							color: 'var(--color-primary)',
+						}}>
 						{label}
 					</label>
 				)}
@@ -99,7 +96,7 @@ const InputField = forwardRef<
 							'text-body-sm',
 							hasError
 								? 'text-[var(--color-error)]'
-								: 'text-[var(--color-on-surface-variant)]',
+								: 'text-[var(--color-primary)]',
 						].join(' ')}>
 						{error ?? hint}
 					</p>
@@ -115,8 +112,8 @@ const InputField = forwardRef<
 		error: _e,
 		fullWidth: _fw,
 		className: _cls,
-		leadingIcon,
-		trailingIcon,
+		prefixIcon: startIcon,
+		suffixIcon: endIcon,
 		...rest
 	} = props as InputFieldProps;
 
@@ -125,14 +122,17 @@ const InputField = forwardRef<
 			{label && (
 				<label
 					htmlFor={fieldId}
-					className='text-label-md text-[var(--color-on-surface-variant)]'>
+					className='text-label-md font-medium'
+					style={{
+						color: 'var(--color-primary)',
+					}}>
 					{label}
 				</label>
 			)}
 			<div className='relative flex items-center'>
-				{leadingIcon && (
-					<span className='absolute left-3 text-[var(--color-on-surface-variant)] pointer-events-none'>
-						{leadingIcon}
+				{startIcon && (
+					<span className='absolute left-3 text-[var(--color-primary)] pointer-events-none'>
+						{startIcon}
 					</span>
 				)}
 				<input
@@ -141,8 +141,8 @@ const InputField = forwardRef<
 					className={[
 						inputBase,
 						hasError ? inputError : '',
-						leadingIcon ? 'pl-9' : '',
-						trailingIcon ? 'pr-9' : '',
+						startIcon ? 'pl-9' : '',
+						endIcon ? 'pr-9' : '',
 					]
 						.filter(Boolean)
 						.join(' ')}
@@ -152,9 +152,9 @@ const InputField = forwardRef<
 					aria-invalid={hasError}
 					{...rest}
 				/>
-				{trailingIcon && (
-					<span className='absolute right-3 text-[var(--color-on-surface-variant)] pointer-events-none'>
-						{trailingIcon}
+				{endIcon && (
+					<span className='absolute right-3 text-[var(--color-primary)] pointer-events-none'>
+						{endIcon}
 					</span>
 				)}
 			</div>
@@ -165,7 +165,7 @@ const InputField = forwardRef<
 						'text-body-sm',
 						hasError
 							? 'text-[var(--color-error)]'
-							: 'text-[var(--color-on-surface-variant)]',
+							: 'text-[var(--color-primary)]',
 					].join(' ')}>
 					{error ?? hint}
 				</p>
