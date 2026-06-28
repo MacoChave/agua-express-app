@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     }
 
     const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', user.id).single();
-    const companyId = profile?.company_id;
+    const companyId = (profile as any)?.company_id;
 
     if (!companyId) {
       return NextResponse.json({ error: 'No company found' }, { status: 400 });
@@ -44,7 +44,9 @@ export async function GET(request: Request) {
     const todayStr = today.toISOString().split('T')[0];
     const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-    (dailyMovements || []).forEach(m => {
+// Cambio aplicado para datos tipo any
+
+    (dailyMovements || []).forEach((m: any) => {
         const val = Number(m.price || 0);
         if (m.move_date === todayStr) {
             if (m.move_type === 'VENTA') todayIncome += val;
@@ -76,7 +78,7 @@ export async function GET(request: Request) {
       
     // Group by month
     const monthlyTotals = new Map<number, number>();
-    (monthlyMovements || []).forEach(m => {
+    (monthlyMovements || []).forEach((m: any) => {
         const d = new Date(m.move_date);
         const mKey = d.getMonth();
         monthlyTotals.set(mKey, (monthlyTotals.get(mKey) || 0) + Number(m.price || 0));
@@ -103,7 +105,7 @@ export async function GET(request: Request) {
       
     const expenseMap = new Map<string, number>();
     let totalMonthlyExpenses = 0;
-    (expenses || []).forEach(e => {
+    (expenses || []).forEach((e: any) => {
         const cat = e.expense_type_id || 'Otros';
         const val = Number(e.price || 0);
         expenseMap.set(cat, (expenseMap.get(cat) || 0) + val);
@@ -136,13 +138,14 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false })
       .limit(5);
       
-    const formattedMovements = (lastMovements || []).map(m => ({
-        id: `${m.move_type}-${m.serial_number}`,
-        concept: m.move_type === 'VENTA' ? 'Venta de producto' : 'Gasto registrado',
-        category: m.expense_type_id || (m.move_type === 'VENTA' ? 'Ingreso' : 'Gasto General'),
-        time: new Date(m.created_at).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' }),
-        amount: m.move_type === 'VENTA' ? Number(m.price || 0) : -Number(m.price || 0),
-        icon: m.move_type === 'VENTA' ? 'payments' : 'shopping_cart'
+    // Cambiamos "m as any" por "m: any"
+    const formattedMovements = (lastMovements || []).map((m: any) => ({
+      id: `${m.move_type}-${m.serial_number}`,
+      concept: m.move_type === 'VENTA' ? 'Venta de producto' : 'Gasto registrado',
+      category: m.expense_type_id || (m.move_type === 'VENTA' ? 'Ingreso' : 'Gasto General'),
+      time: new Date(m.created_at).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' }),
+      amount: m.move_type === 'VENTA' ? Number(m.price || 0) : -Number(m.price || 0),
+      icon: m.move_type === 'VENTA' ? 'payments' : 'shopping_cart'
     }));
 
     return NextResponse.json({

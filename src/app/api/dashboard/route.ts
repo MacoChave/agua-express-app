@@ -12,7 +12,7 @@ export async function GET() {
 
     // Get user's company
     const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', user.id).single();
-    const companyId = profile?.company_id;
+    const companyId = (profile as any)?.company_id ?? null;
 
     if (!companyId) {
       return NextResponse.json({ error: 'No company found' }, { status: 400 });
@@ -40,8 +40,8 @@ export async function GET() {
       .gte('created_at', yesterday.toISOString())
       .lt('created_at', today.toISOString());
 
-    const todayTotal = todayOrders?.reduce((acc, order) => acc + Number(order.total), 0) || 0;
-    const yesterdayTotal = yesterdayOrders?.reduce((acc, order) => acc + Number(order.total), 0) || 0;
+    const todayTotal = todayOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
+    const yesterdayTotal = yesterdayOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
     const salesIncrease = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : (todayTotal > 0 ? 100 : 0);
 
     // 2. Próximo mantenimiento
@@ -74,8 +74,8 @@ export async function GET() {
         increase: salesIncrease,
       },
       maintenance: nextMaintenance ? {
-        equipmentName: `Equipo #${nextMaintenance.equipment_id}`,
-        date: nextMaintenance.date,
+        equipmentName: `Equipo #${(nextMaintenance as any).equipment_id}`,
+        date: (nextMaintenance as any).date,
       } : null,
       systemHealth,
     });
