@@ -13,7 +13,7 @@ interface GastoFormProps {
 
 export default function GastoForm({ onConfirm }: GastoFormProps) {
 	const [tipoGasto, setTipoGasto] = useState('');
-	const [monto, setMonto] = useState('');
+	const [monto, setMonto] = useState(0);
 	const [archivo, setArchivo] = useState<File | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [expenseTypes, setExpenseTypes] = useState<any[]>([]);
@@ -86,7 +86,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 			await apiClient.post('/inventory-movements', {
 				move_type: 'COMPRA', // Placeholder para tipo de movimiento de gasto
 				quantity: 1, // Un gasto suele ser una unidad
-				price: parseFloat(monto),
+				price: monto,
 				expense_type_id: tipoGasto,
 				move_date: new Date().toISOString().split('T')[0],
 				notes: `Registro de gasto: ${tipoGasto}`,
@@ -153,14 +153,14 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 					<InputField
 						label='Monto del gasto'
 						type='number'
-						placeholder='0.00'
-						value={monto}
-						onChange={(e) => setMonto(e.target.value)}
-						leadingIcon={
-							<span className='text-body-md font-semibold'>
-								Q
-							</span>
-						}
+						placeholder='200'
+						value={monto === 0 ? '' : monto}
+						onChange={(e) => {
+							let value = parseFloat(e.target.value);
+							if (!isNaN(value)) setMonto(value);
+							else setMonto(0);
+						}}
+						prefixIcon='Q'
 					/>
 
 					{/* Subir Evidencia */}

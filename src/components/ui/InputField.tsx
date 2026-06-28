@@ -13,8 +13,10 @@ interface InputFieldProps
 		BaseFieldProps,
 		Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
 	as?: 'input';
-	leadingIcon?: React.ReactNode;
-	trailingIcon?: React.ReactNode;
+	leftAction?: React.ReactNode;
+	prefixIcon?: React.ReactNode;
+	suffixIcon?: React.ReactNode;
+	rightAction?: React.ReactNode;
 }
 
 interface TextareaFieldProps
@@ -22,19 +24,18 @@ interface TextareaFieldProps
 		BaseFieldProps,
 		Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> {
 	as: 'textarea';
-	leadingIcon?: never;
-	trailingIcon?: never;
+	prefixIcon?: never;
+	suffixIcon?: never;
 }
 
 type FieldProps = InputFieldProps | TextareaFieldProps;
 
 const inputBase = [
-	'w-full bg-[var(--color-surface-container-low)] text-[var(--color-on-surface)]',
-	'border border-[var(--color-outline-variant)] rounded-[var(--radius-md)]',
-	'px-3 py-2 text-body-md placeholder:text-[var(--color-on-surface-variant)]',
-	'transition-all duration-150',
-	'focus:outline-none focus:border-[var(--color-secondary)] focus:ring-2 focus:ring-[var(--color-secondary)]/20',
-	'disabled:opacity-40 disabled:cursor-not-allowed',
+	'w-full text-left',
+	'h-10 px-4 text-headline-sm font-semibold',
+	'text-[var(--color-primary)]',
+	'[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+	'focus:outline-none focus:ring-0',
 ].join(' ');
 
 const inputError = [
@@ -51,19 +52,15 @@ const InputField = forwardRef<
 	const fieldId = props.id ?? props.name;
 	const hasError = Boolean(error);
 
-	const wrapperClass = [
-		'flex flex-col gap-1',
-		fullWidth ? 'w-full' : '',
-		className,
-	]
+	const wrapperClass = ['space-y-1', fullWidth ? 'w-full' : '', className]
 		.filter(Boolean)
 		.join(' ');
 
 	if (props.as === 'textarea') {
 		const {
 			as: _as,
-			leadingIcon: _l,
-			trailingIcon: _t,
+			prefixIcon: _l,
+			suffixIcon: _r,
 			label: _lb,
 			hint: _h,
 			error: _e,
@@ -76,22 +73,27 @@ const InputField = forwardRef<
 				{label && (
 					<label
 						htmlFor={fieldId}
-						className='text-label-md text-[var(--color-on-surface-variant)]'>
+						className='text-label-md font-medium'
+						style={{
+							color: 'var(--color-primary)',
+						}}>
 						{label}
 					</label>
 				)}
-				<textarea
-					ref={ref as React.Ref<HTMLTextAreaElement>}
-					id={fieldId}
-					className={[inputBase, hasError ? inputError : '']
-						.filter(Boolean)
-						.join(' ')}
-					aria-describedby={
-						hint || error ? `${fieldId}-helper` : undefined
-					}
-					aria-invalid={hasError}
-					{...rest}
-				/>
+				<div className='relative flex items-center bg-[var(--color-surface-bright)] border border-[var(--color-outline-variant)] rounded-md'>
+					<textarea
+						ref={ref as React.Ref<HTMLTextAreaElement>}
+						id={fieldId}
+						className={[inputBase, hasError ? inputError : '']
+							.filter(Boolean)
+							.join(' ')}
+						aria-describedby={
+							hint || error ? `${fieldId}-helper` : undefined
+						}
+						aria-invalid={hasError}
+						{...rest}
+					/>
+				</div>
 				{(hint || error) && (
 					<p
 						id={`${fieldId}-helper`}
@@ -99,7 +101,7 @@ const InputField = forwardRef<
 							'text-body-sm',
 							hasError
 								? 'text-[var(--color-error)]'
-								: 'text-[var(--color-on-surface-variant)]',
+								: 'text-[var(--color-primary)]',
 						].join(' ')}>
 						{error ?? hint}
 					</p>
@@ -115,8 +117,10 @@ const InputField = forwardRef<
 		error: _e,
 		fullWidth: _fw,
 		className: _cls,
-		leadingIcon,
-		trailingIcon,
+		prefixIcon: prefixIcon,
+		suffixIcon: suffixIcon,
+		leftAction: leftAction,
+		rightAction: rightAction,
 		...rest
 	} = props as InputFieldProps;
 
@@ -125,14 +129,18 @@ const InputField = forwardRef<
 			{label && (
 				<label
 					htmlFor={fieldId}
-					className='text-label-md text-[var(--color-on-surface-variant)]'>
+					className='text-label-md font-medium'
+					style={{
+						color: 'var(--color-primary)',
+					}}>
 					{label}
 				</label>
 			)}
-			<div className='relative flex items-center'>
-				{leadingIcon && (
-					<span className='absolute left-3 text-[var(--color-on-surface-variant)] pointer-events-none'>
-						{leadingIcon}
+			<div className='relative flex items-center bg-[var(--color-surface-bright)] border border-[var(--color-outline-variant)] rounded-md'>
+				{leftAction && leftAction}
+				{prefixIcon && (
+					<span className='absolute left-3 text-[var(--color-primary)] pointer-events-none'>
+						{prefixIcon}
 					</span>
 				)}
 				<input
@@ -141,8 +149,8 @@ const InputField = forwardRef<
 					className={[
 						inputBase,
 						hasError ? inputError : '',
-						leadingIcon ? 'pl-9' : '',
-						trailingIcon ? 'pr-9' : '',
+						prefixIcon ? 'pl-9' : '',
+						suffixIcon ? 'pr-9' : '',
 					]
 						.filter(Boolean)
 						.join(' ')}
@@ -152,11 +160,12 @@ const InputField = forwardRef<
 					aria-invalid={hasError}
 					{...rest}
 				/>
-				{trailingIcon && (
-					<span className='absolute right-3 text-[var(--color-on-surface-variant)] pointer-events-none'>
-						{trailingIcon}
+				{suffixIcon && (
+					<span className='absolute right-3 text-[var(--color-primary)] pointer-events-none'>
+						{suffixIcon}
 					</span>
 				)}
+				{rightAction && rightAction}
 			</div>
 			{(hint || error) && (
 				<p
@@ -165,7 +174,7 @@ const InputField = forwardRef<
 						'text-body-sm',
 						hasError
 							? 'text-[var(--color-error)]'
-							: 'text-[var(--color-on-surface-variant)]',
+							: 'text-[var(--color-primary)]',
 					].join(' ')}>
 					{error ?? hint}
 				</p>
