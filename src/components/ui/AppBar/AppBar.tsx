@@ -14,6 +14,7 @@ export default function AppBar() {
 	const router = useRouter();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [userProfile, setUserProfile] = useState<{ full_name?: string; role?: string } | null>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const supabase = createClient();
 
@@ -25,10 +26,11 @@ export default function AppBar() {
 			if (user) {
 				const { data: profile } = await supabase
 					.from('profiles')
-					.select('role')
+					.select('role, full_name')
 					.eq('id', user.id)
 					.single();
 				setIsAdmin((profile as any)?.role === 'admin');
+				setUserProfile(profile as any);
 			}
 		}
 		checkRole();
@@ -54,6 +56,15 @@ export default function AppBar() {
 		} catch (error) {
 			console.error('Error logging out:', error);
 		}
+	};
+
+	const getInitials = (name?: string) => {
+		if (!name) return 'U';
+		const parts = name.trim().split(/\s+/);
+		if (parts.length >= 2) {
+			return (parts[0][0] + parts[1][0]).toUpperCase();
+		}
+		return name.substring(0, 2).toUpperCase();
 	};
 
 	return (
@@ -109,7 +120,7 @@ export default function AppBar() {
 								'var(--color-surface-container)',
 							color: 'var(--color-primary)',
 						}}>
-						TC
+						{getInitials(userProfile?.full_name)}
 					</button>
 
 					{/* Dropdown Menu */}
@@ -119,8 +130,8 @@ export default function AppBar() {
 								<p className='text-label-md text-[var(--color-on-surface-variant)] uppercase'>
 									Usuario
 								</p>
-								<p className='text-body-md font-bold truncate'>
-									Técnico de Control
+								<p className='text-body-md font-bold truncate capitalize'>
+									{userProfile?.role || 'Cargando...'}
 								</p>
 							</div>
 

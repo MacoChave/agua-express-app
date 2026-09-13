@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button, Card } from '@/components/ui';
 import OrderApprove from '@/assets/icons/order_approve.svg';
 import Build from '@/assets/icons/build.svg';
@@ -33,20 +34,34 @@ function Progress({
 
 export default function DashboardPage() {
 	const [dashboardData, setDashboardData] = useState<any>(null);
+	const [showToast, setShowToast] = useState(false);
+	const router = useRouter();
 
 	useEffect(() => {
 		fetch('/api/dashboard')
 			.then((res) => res.json())
 			.then((data) => {
-				setDashboardData(data);
+				if (data.error === 'Unauthorized') {
+					setShowToast(true);
+					setTimeout(() => {
+						router.push('/login');
+					}, 2500);
+				} else {
+					setDashboardData(data);
+				}
 			})
 			.catch((err) =>
 				console.error('Failed to fetch dashboard data:', err),
 			);
-	}, []);
+	}, [router]);
 
 	return (
 		<div>
+			{showToast && (
+				<div className='fixed bottom-6 right-6 z-50 p-4 rounded-lg bg-error text-on-error shadow-lg transition-opacity duration-300'>
+					No se encontró sesión. Redirigiendo al login...
+				</div>
+			)}
 			<div className='pt-8 pb-8 px-4 md:px-8 max-w-7xl mx-auto space-y-6'>
 				<section className='flex flex-col md:flex-row md:items-end justify-between gap-4'>
 					<div className='space-y-1'>

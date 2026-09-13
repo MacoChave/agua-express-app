@@ -133,26 +133,6 @@ export default function LoginPage() {
 							/>
 						</div>
 
-						<label className='inline-flex items-center gap-2 cursor-pointer select-none'>
-							<input
-								id='remember-me'
-								name='remember-me'
-								type='checkbox'
-								className='h-4 w-4 rounded-sm border'
-								style={{
-									borderColor: 'var(--color-outline-variant)',
-									accentColor: 'var(--color-primary)',
-								}}
-							/>
-							<span
-								className='text-body-sm'
-								style={{
-									color: 'var(--color-on-surface-variant)',
-								}}>
-								Recordarme en este dispositivo
-							</span>
-						</label>
-
 						<Button type='submit' fullWidth loading={loading}>
 							{loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
 						</Button>
