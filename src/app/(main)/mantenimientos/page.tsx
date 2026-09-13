@@ -12,7 +12,6 @@ import ArrowForward from '@/assets/icons/arrow_forward.svg';
 import CheckCircle from '@/assets/icons/check_circle.svg';
 import Event from '@/assets/icons/event.svg';
 import MoreVert from '@/assets/icons/more_vert.svg';
-import Notifications from '@/assets/icons/notifications.svg';
 import { ProgramarMantenimiento } from '@/features/mantenimientos/components/ProgramarMantenimiento';
 import DatePicker, {
 	DatePickerValue,
@@ -62,28 +61,8 @@ export default function MantenimientosPage() {
 
 	return (
 		<>
-			{/* ── Top App Bar ──────────────────────────────── */}
-			<header className='fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-12 h-16 bg-[var(--color-surface)] border-b border-[var(--color-outline-variant)]'>
-				<div className='flex items-center gap-3'>
-					<h1 className='text-headline-md font-bold text-[var(--color-primary)]'>
-						AquaFlow Manager
-					</h1>
-				</div>
-				<div className='flex items-center gap-4'>
-					<button className='p-2 rounded-full hover:bg-[var(--color-surface-container)] transition-colors relative'>
-						<Notifications className='w-6 h-6 text-[var(--color-primary)]' />
-						<span className='absolute top-2 right-2 w-2 h-2 bg-[var(--color-error)] rounded-full' />
-					</button>
-					<div className='w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--color-primary-container)] bg-[var(--color-surface-container)] flex items-center justify-center'>
-						<span className='material-symbols-outlined text-[var(--color-primary)]'>
-							person
-						</span>
-					</div>
-				</div>
-			</header>
-
 			{/* ── Main Content ─────────────────────────────── */}
-			<main className='pt-24 pb-28 px-4 md:px-12 max-w-7xl mx-auto'>
+			<main className='pt-8 pb-8 px-4 md:px-12 max-w-7xl mx-auto'>
 				{/* Welcome */}
 				<section className='mb-8'>
 					<h2 className='text-headline-lg font-semibold text-[var(--color-on-surface)] mb-1'>

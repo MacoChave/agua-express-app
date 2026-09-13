@@ -126,7 +126,7 @@ export default function UsersPage() {
 	};
 
 	return (
-		<div className='pt-8 px-4 md:px-8 max-w-7xl mx-auto space-y-6'>
+		<div className='pt-8 px-8 md:px-8 max-w-7xl mx-auto space-y-6'>
 			<section className='flex flex-col md:flex-row md:items-end justify-between gap-4'>
 				<div className='space-y-1'>
 					<h1 className='text-headline-lg text-primary'>

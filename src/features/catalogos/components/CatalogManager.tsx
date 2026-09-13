@@ -83,7 +83,7 @@ export function CatalogManager() {
 
 	return (
 		<div className='pb-24'>
-			<main className='pt-20 px-4 md:px-12 max-w-7xl mx-auto'>
+			<main className='pt-8 px-8 md:px-12 max-w-7xl mx-auto'>
 				{/* Tab Switcher */}
 				<div className='flex overflow-x-auto overflow-y-hidden gap-6 border-b border-[var(--color-outline-variant)] mb-8 sticky top-16 bg-[var(--color-background)]/80 backdrop-blur-md z-40'>
 					{(Object.keys(CATALOG_METADATA) as CatalogType[]).map(
