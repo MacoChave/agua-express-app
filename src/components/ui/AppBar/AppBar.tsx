@@ -9,12 +9,16 @@ import Notifications from '@/assets/icons/notifications.svg';
 import Person from '@/assets/icons/person.svg';
 import Logout from '@/assets/icons/logout.svg';
 import ManageAccounts from '@/assets/icons/manage_accounts.svg';
+import Enterprise from '@/assets/icons/enterprise.svg';
 
 export default function AppBar() {
 	const router = useRouter();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [userProfile, setUserProfile] = useState<{ full_name?: string; role?: string } | null>(null);
+	const [userProfile, setUserProfile] = useState<{
+		full_name?: string;
+		role?: string;
+	} | null>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const supabase = createClient();
 
@@ -116,8 +120,7 @@ export default function AppBar() {
 						className='w-10 h-10 rounded-full border-2 flex items-center justify-center text-label-md font-bold overflow-hidden transition-transform active:scale-95'
 						style={{
 							borderColor: 'var(--color-primary-container)',
-							backgroundColor:
-								'var(--color-surface-container)',
+							backgroundColor: 'var(--color-surface-container)',
 							color: 'var(--color-primary)',
 						}}>
 						{getInitials(userProfile?.full_name)}
@@ -144,13 +147,22 @@ export default function AppBar() {
 							</Link>
 
 							{isAdmin && (
-								<Link
-									href='/users'
-									onClick={() => setMenuOpen(false)}
-									className='flex items-center gap-3 px-4 py-2 text-body-md text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-high)] transition-colors'>
-									<ManageAccounts className='w-5 h-5' />
-									Gestión de Usuarios
-								</Link>
+								<>
+									<Link
+										href='/users'
+										onClick={() => setMenuOpen(false)}
+										className='flex items-center gap-3 px-4 py-2 text-body-md text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-high)] transition-colors'>
+										<ManageAccounts className='w-5 h-5' />
+										Gestión de Usuarios
+									</Link>
+									<Link
+										href='/empresa'
+										onClick={() => setMenuOpen(false)}
+										className='flex items-center gap-3 px-4 py-2 text-body-md text-[var(--color-on-surface)] hover:bg-[var(--color-surface-container-high)] transition-colors'>
+										<Enterprise className='w-5 h-5' />
+										Empresa
+									</Link>
+								</>
 							)}
 
 							<button
