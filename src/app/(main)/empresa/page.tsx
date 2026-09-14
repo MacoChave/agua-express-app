@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Card, DataTable, InputField } from '@/components/ui';
+import { Button, Card, DataTable, InputField, Modal } from '@/components/ui';
 import type { Column } from '@/components/ui';
 import AddCircle from '@/assets/icons/add_circle.svg';
 import Edit from '@/assets/icons/edit.svg';
@@ -331,14 +331,14 @@ export default function EmpresaPage() {
 				</div>
 			</div>
 
-			{showBranchModal && (
-				<div className='fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50'>
-					<Card className='w-full md:max-w-1/2 shadow-2xl animate-in fade-in zoom-in duration-200'>
-						<h2 className='text-headline-sm text-primary mb-6'>
-							{editingBranch
-								? 'Editar Sucursal'
-								: 'Nueva Sucursal'}
-						</h2>
+			<Modal
+				isOpen={showBranchModal}
+				onClose={() => {
+					setShowBranchModal(false);
+					setEditingBranch(null);
+				}}
+				title={editingBranch ? 'Editar Sucursal' : 'Nueva Sucursal'}
+				maxWidth='6/12'>
 						<form
 							onSubmit={handleAddOrUpdateBranch}
 							className='space-y-4'>
@@ -386,9 +386,7 @@ export default function EmpresaPage() {
 								</Button>
 							</div>
 						</form>
-					</Card>
-				</div>
-			)}
+			</Modal>
 		</div>
 	);
 }

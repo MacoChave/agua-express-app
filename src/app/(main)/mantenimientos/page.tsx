@@ -12,6 +12,7 @@ import ArrowForward from '@/assets/icons/arrow_forward.svg';
 import CheckCircle from '@/assets/icons/check_circle.svg';
 import Event from '@/assets/icons/event.svg';
 import MoreVert from '@/assets/icons/more_vert.svg';
+import WaterDrop from '@/assets/icons/water_drop.svg';
 import { ProgramarMantenimiento } from '@/features/mantenimientos/components/ProgramarMantenimiento';
 import DatePicker, {
 	DatePickerValue,
@@ -92,9 +93,7 @@ export default function MantenimientosPage() {
 							{/* Plant image placeholder */}
 							<div className='relative h-48 w-full rounded-lg overflow-hidden mb-4 bg-[var(--color-surface-container)]'>
 								<div className='absolute inset-0 flex items-center justify-center'>
-									<span className='material-symbols-outlined text-[80px] text-[var(--color-primary-container)]'>
-										water
-									</span>
+									<WaterDrop className='w-20 h-20' />
 								</div>
 								<div className='absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/60 to-transparent flex items-end p-4'>
 									<p className='text-[var(--color-on-primary)] text-label-md font-medium'>

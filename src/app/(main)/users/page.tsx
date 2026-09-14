@@ -7,6 +7,7 @@ import {
 	DataTable,
 	InputField,
 	StatusChip,
+	Modal,
 } from '@/components/ui';
 import type { Column } from '@/components/ui';
 import AddCircle from '@/assets/icons/add_circle.svg';
@@ -360,15 +361,15 @@ export default function UsersPage() {
 				</div>
 			</Card>
 
-			{/* Modal de Nuevo Usuario (Simulado con overlay fijo) */}
-			{showAddModal && (
-				<div className='fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50'>
-					<Card className='w-full md:max-w-6/12 shadow-2xl animate-in fade-in zoom-in duration-200'>
-						<h2 className='text-headline-sm text-primary mb-6'>
-							{editingUser
-								? 'Editar Usuario'
-								: 'Crear Nuevo Usuario'}
-						</h2>
+			{/* Modal de Nuevo Usuario */}
+			<Modal
+				isOpen={showAddModal}
+				onClose={() => {
+					setShowAddModal(false);
+					setEditingUser(null);
+				}}
+				title={editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
+				maxWidth='6/12'>
 						<form
 							onSubmit={handleAddOrUpdateUser}
 							className='space-y-4'>
@@ -462,9 +463,7 @@ export default function UsersPage() {
 								</Button>
 							</div>
 						</form>
-					</Card>
-				</div>
-			)}
+			</Modal>
 		</div>
 	);
 }

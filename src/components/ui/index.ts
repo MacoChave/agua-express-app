@@ -1,3 +1,5 @@
+export { Toast } from './Toast/Toast';
+export { default as Modal } from './Modal';
 export { default as Button } from './Button/Button';
 export { Card, CardHeader, CardSection, default } from './Card/Card';
 export { default as StatusChip } from './StatusChip/StatusChip';
