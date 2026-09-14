@@ -167,27 +167,29 @@ export function DashboardManager() {
 						<div className='flex items-end justify-between'>
 							<div className='space-y-1'>
 								<span className='text-headline-xl text-primary'>
-									$
 									{dashboardData
-										? formatCurrency(dashboardData.sales.total)
+										? formatCurrency(
+												dashboardData.daily.income,
+											)
 										: formatCurrency(0)}
 								</span>
 								<div
-									className={`flex items-center gap-1 text-label-md ${dashboardData && dashboardData.sales.increase < 0 ? 'text-red-600' : 'text-green-600'}`}>
+									className={`flex items-center gap-1 text-label-md ${dashboardData && dashboardData.daily.incomeIncrease < 0 ? 'text-red-600' : 'text-green-600'}`}>
 									<span>
 										<TrendingUp
-											className={`w-5 h-5 ${dashboardData && dashboardData.sales.increase < 0 ? 'rotate-180' : ''}`}
+											className={`w-5 h-5 ${dashboardData && dashboardData.daily.incomeIncrease < 0 ? 'rotate-180' : ''}`}
 										/>
 									</span>{' '}
 									{dashboardData
-										? (dashboardData.sales.increase > 0
+										? (dashboardData.daily.incomeIncrease >
+											0
 												? '+'
 												: '') +
-											dashboardData.sales.increase.toFixed(
+											dashboardData.daily.incomeIncrease.toFixed(
 												1,
 											) +
 											'%'
-										: '+12.5%'}{' '}
+										: '+0.0%'}{' '}
 									vs ayer
 								</div>
 							</div>
@@ -196,6 +198,61 @@ export function DashboardManager() {
 								<div className='bg-secondary-container w-full h-3/4 rounded-t-sm' />
 								<div className='bg-secondary-container w-full h-2/3 rounded-t-sm' />
 								<div className='bg-primary w-full h-full rounded-t-sm' />
+							</div>
+						</div>
+					</Card>
+
+					<Card
+						variant='default'
+						padding='lg'
+						className='md:col-span-2 lg:col-span-2 border border-surface-container'>
+						<div className='flex justify-between items-start mb-6'>
+							<div>
+								<span className='text-label-md text-on-surface-variant block mb-1'>
+									CUADRE DE LA SEMANA
+								</span>
+								<h2 className='text-headline-md text-primary'>
+									Ventas Totales
+								</h2>
+							</div>
+							<div className='p-2 bg-secondary-container/20 rounded-lg text-secondary'>
+								<AccountBalanceWallet className='w-6 h-6' />
+							</div>
+						</div>
+						<div className='flex items-end justify-between'>
+							<div className='space-y-1'>
+								<span className='text-headline-xl text-primary'>
+									{dashboardData
+										? formatCurrency(
+												dashboardData.weekly
+													.currentIncome,
+											)
+										: formatCurrency(0)}
+								</span>
+								<div
+									className={`flex items-center gap-1 text-label-md ${dashboardData && dashboardData.weekly.increase < 0 ? 'text-red-600' : 'text-green-600'}`}>
+									<span>
+										<TrendingUp
+											className={`w-5 h-5 ${dashboardData && dashboardData.weekly.increase < 0 ? 'rotate-180' : ''}`}
+										/>
+									</span>{' '}
+									{dashboardData
+										? (dashboardData.weekly.increase > 0
+												? '+'
+												: '') +
+											dashboardData.weekly.increase.toFixed(
+												1,
+											) +
+											'%'
+										: '+0.0%'}{' '}
+									vs semana ant.
+								</div>
+							</div>
+							<div className='h-16 w-32 flex items-end gap-1'>
+								<div className='bg-secondary-container w-full h-2/3 rounded-t-sm' />
+								<div className='bg-secondary-container w-full h-1/2 rounded-t-sm' />
+								<div className='bg-secondary-container w-full h-full rounded-t-sm' />
+								<div className='bg-primary w-full h-3/4 rounded-t-sm' />
 							</div>
 						</div>
 					</Card>

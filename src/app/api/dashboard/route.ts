@@ -44,6 +44,37 @@ export async function GET() {
     const yesterdayTotal = yesterdayOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
     const salesIncrease = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : (todayTotal > 0 ? 100 : 0);
 
+    // Calculate week bounds
+    const currentWeekStart = new Date(today);
+    const day = currentWeekStart.getDay();
+    const diff = currentWeekStart.getDate() - day + (day === 0 ? -6 : 1);
+    currentWeekStart.setDate(diff);
+    currentWeekStart.setHours(0,0,0,0);
+    
+    const lastWeekStart = new Date(currentWeekStart);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+    
+    const lastWeekEnd = new Date(currentWeekStart);
+    lastWeekEnd.setHours(0,0,0,0); // Up to start of this week
+
+    const { data: currentWeekOrders } = await supabase
+      .from('orders')
+      .select('total')
+      .eq('company_id', companyId)
+      .gte('created_at', currentWeekStart.toISOString())
+      .lt('created_at', tomorrow.toISOString());
+
+    const { data: lastWeekOrders } = await supabase
+      .from('orders')
+      .select('total')
+      .eq('company_id', companyId)
+      .gte('created_at', lastWeekStart.toISOString())
+      .lt('created_at', lastWeekEnd.toISOString());
+
+    const currentWeekTotal = currentWeekOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
+    const lastWeekTotal = lastWeekOrders?.reduce((acc, order: any) => acc + Number(order.total), 0) || 0;
+    const weeklyIncrease = lastWeekTotal > 0 ? ((currentWeekTotal - lastWeekTotal) / lastWeekTotal) * 100 : (currentWeekTotal > 0 ? 100 : 0);
+
     // 2. Próximo mantenimiento
     const { data: nextMaintenance } = await supabase
       .from('maintenance_tasks')
@@ -69,6 +100,15 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      daily: {
+        income: todayTotal,
+        incomeIncrease: salesIncrease,
+      },
+      weekly: {
+        currentIncome: currentWeekTotal,
+        increase: weeklyIncrease,
+        lastIncome: lastWeekTotal,
+      },
       sales: {
         total: todayTotal,
         increase: salesIncrease,

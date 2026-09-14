@@ -22,46 +22,75 @@ export async function GET(request: Request) {
     today.setHours(0,0,0,0);
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Calculate week bounds
+    const currentWeekStart = new Date(today);
+    const day = currentWeekStart.getDay();
+    const diff = currentWeekStart.getDate() - day + (day === 0 ? -6 : 1);
+    currentWeekStart.setDate(diff);
+    
+    const lastWeekStart = new Date(currentWeekStart);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+    
+    const lastWeekEnd = new Date(currentWeekStart);
+    lastWeekEnd.setDate(lastWeekEnd.getDate() - 1);
+
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // Fetch all movements for the company
-    // For large datasets, doing this in-memory is bad, but for a small app it's fine.
-    // We'll fetch today's and yesterday's movements specifically, and some for history.
-    const { data: dailyMovements } = await supabase
+    const { data: movements } = await supabase
       .from('inventory_movements')
       .select('move_type, price, move_date, expense_type_id')
       .eq('company_id', companyId)
-      .gte('move_date', yesterday.toISOString().split('T')[0])
+      .gte('move_date', lastWeekStart.toISOString().split('T')[0])
       .lte('move_date', today.toISOString().split('T')[0]);
       
     let todayIncome = 0;
     let todayExpense = 0;
     let yesterdayIncome = 0;
     let yesterdayExpense = 0;
+    
+    let currentWeekIncome = 0;
+    let currentWeekExpense = 0;
+    let lastWeekIncome = 0;
+    let lastWeekExpense = 0;
 
     const todayStr = today.toISOString().split('T')[0];
     const yesterdayStr = yesterday.toISOString().split('T')[0];
+    const currentWeekStartStr = currentWeekStart.toISOString().split('T')[0];
+    const lastWeekStartStr = lastWeekStart.toISOString().split('T')[0];
+    const lastWeekEndStr = lastWeekEnd.toISOString().split('T')[0];
 
-// Cambio aplicado para datos tipo any
-
-    (dailyMovements || []).forEach((m: any) => {
+    (movements || []).forEach((m: any) => {
         const val = Number(m.price || 0);
-        if (m.move_date === todayStr) {
+        const dateStr = m.move_date;
+        
+        // Daily
+        if (dateStr === todayStr) {
             if (m.move_type === 'VENTA') todayIncome += val;
             if (m.move_type === 'COMPRA') todayExpense += val;
-        } else if (m.move_date === yesterdayStr) {
+        } else if (dateStr === yesterdayStr) {
             if (m.move_type === 'VENTA') yesterdayIncome += val;
             if (m.move_type === 'COMPRA') yesterdayExpense += val;
+        }
+        
+        // Weekly
+        if (dateStr >= currentWeekStartStr && dateStr <= todayStr) {
+            if (m.move_type === 'VENTA') currentWeekIncome += val;
+            if (m.move_type === 'COMPRA') currentWeekExpense += val;
+        } else if (dateStr >= lastWeekStartStr && dateStr <= lastWeekEndStr) {
+            if (m.move_type === 'VENTA') lastWeekIncome += val;
+            if (m.move_type === 'COMPRA') lastWeekExpense += val;
         }
     });
 
     const incomeIncrease = yesterdayIncome > 0 ? ((todayIncome - yesterdayIncome) / yesterdayIncome) * 100 : (todayIncome > 0 ? 100 : 0);
     const expenseIncrease = yesterdayExpense > 0 ? ((todayExpense - yesterdayExpense) / yesterdayExpense) * 100 : (todayExpense > 0 ? 100 : 0);
-
     const netProfit = todayIncome - todayExpense;
     const profitMargin = todayIncome > 0 ? (netProfit / todayIncome) * 100 : 0;
+
+    const currentWeekNet = currentWeekIncome - currentWeekExpense;
+    const lastWeekNet = lastWeekIncome - lastWeekExpense;
+    const weeklyIncrease = lastWeekIncome > 0 ? ((currentWeekIncome - lastWeekIncome) / lastWeekIncome) * 100 : (currentWeekIncome > 0 ? 100 : 0);
 
     // Last 5 months
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -156,6 +185,15 @@ export async function GET(request: Request) {
           expenseIncrease,
           netProfit,
           profitMargin
+      },
+      weekly: {
+          currentIncome: currentWeekIncome,
+          currentExpense: currentWeekExpense,
+          currentNet: currentWeekNet,
+          lastIncome: lastWeekIncome,
+          lastExpense: lastWeekExpense,
+          lastNet: lastWeekNet,
+          increase: weeklyIncrease
       },
       barData: scaledBarData,
       distribution,
