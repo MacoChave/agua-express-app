@@ -18,12 +18,14 @@ import DatePicker, {
 	DatePickerValue,
 } from '@/components/ui/DatePicker/DatePicker';
 import { formatToAPIDate, formatDate } from '@/lib/utils';
+import { Modal } from '@/components/ui';
 
 export function MantenimientosManager() {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [scheduleOpen, setScheduleOpen] = useState(false);
 	const [tasks, setTasks] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [lastBackwash, setLastBackwash] = useState<any>(null);
 	const [dateRange, setDateRange] = useState(() => {
 		const today = new Date();
 		const day = today.getDay();
@@ -42,6 +44,20 @@ export function MantenimientosManager() {
 		return formatToAPIDate(value);
 	};
 
+	const getTimeAgo = (dateString: string | undefined) => {
+		if (!dateString) return '--';
+		const date = new Date(dateString);
+		const now = new Date();
+		const diffMs = now.getTime() - date.getTime();
+		const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+		if (diffHrs < 24) {
+			if (diffHrs <= 0) return 'Hace poco';
+			return `Hace ${diffHrs}h`;
+		}
+		const diffDays = Math.floor(diffHrs / 24);
+		return `Hace ${diffDays}d`;
+	};
+
 	useEffect(() => {
 		async function fetchTasks() {
 			try {
@@ -56,7 +72,16 @@ export function MantenimientosManager() {
 				setLoading(false);
 			}
 		}
+		async function fetchLastBackwash() {
+			try {
+				const data = await apiClient.get<any>('/maintenance-tasks/last-backwash');
+				setLastBackwash(data);
+			} catch (error) {
+				console.error('Error fetching last backwash:', error);
+			}
+		}
 		fetchTasks();
+		fetchLastBackwash();
 	}, [modalOpen, scheduleOpen, dateRange.startDate, dateRange.endDate]);
 
 	return (
@@ -108,7 +133,7 @@ export function MantenimientosManager() {
 										Último Retro-lavado
 									</p>
 									<p className='text-headline-sm font-semibold text-[var(--color-primary)]'>
-										Hace 4h
+										{lastBackwash ? getTimeAgo(lastBackwash.date) : '--'}
 									</p>
 								</div>
 								<div className='bg-[var(--color-surface-container)] p-4 rounded-lg'>
@@ -234,9 +259,12 @@ export function MantenimientosManager() {
 														</h4>
 														<p className='text-body-sm text-[var(--color-on-surface-variant)]'>
 															Fecha:{' '}
-															{formatDate(task.date, {
-																month: 'short'
-															})}
+															{formatDate(
+																task.date,
+																{
+																	month: 'short',
+																},
+															)}
 														</p>
 													</div>
 												</div>
@@ -284,14 +312,22 @@ export function MantenimientosManager() {
 			</main>
 
 			{/* ── Modal ────────────────────────────────────── */}
-			<NewMaintenanceModal
-				open={modalOpen}
+			<Modal
+				isOpen={modalOpen}
 				onClose={() => setModalOpen(false)}
-			/>
-			<ProgramarMantenimiento
+				title='Registrar Nuevo Mantenimiento'
+				maxWidth='md'>
+				<NewMaintenanceModal onClose={() => setModalOpen(false)} />
+			</Modal>
+			<Modal
 				isOpen={scheduleOpen}
 				onClose={() => setScheduleOpen(false)}
-			/>
+				title='Programar Tarea'
+				maxWidth='md'>
+				<ProgramarMantenimiento
+					onClose={() => setScheduleOpen(false)}
+				/>
+			</Modal>
 		</>
 	);
 }
