@@ -60,7 +60,12 @@ export async function updateSession(request: NextRequest) {
 			if (proxyData.company_id) {
 				requestHeaders.set('x-company-id', proxyData.company_id.toString());
 			}
-			if (proxyData.warehouse_id) {
+			
+			// Override warehouse for admins if selected_warehouse_id cookie exists
+			const selectedWarehouseId = request.cookies.get('selected_warehouse_id')?.value;
+			if (proxyData.role === 'admin' && selectedWarehouseId) {
+				requestHeaders.set('x-warehouse-id', selectedWarehouseId);
+			} else if (proxyData.warehouse_id) {
 				requestHeaders.set(
 					'x-warehouse-id',
 					proxyData.warehouse_id.toString(),

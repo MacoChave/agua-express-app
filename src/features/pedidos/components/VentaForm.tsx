@@ -6,12 +6,15 @@ import Add from '@/assets/icons/add.svg';
 import Save from '@/assets/icons/save.svg';
 import { apiClient } from '@/lib/apiClient';
 import { Button, InputField } from '@/components/ui';
+import { useToast } from '@/components/ui/Toast/ToastContext';
+import DatePicker, { DatePickerValue } from '@/components/ui/DatePicker/DatePicker';
 
 interface VentaFormProps {
 	onConfirm: () => void;
 }
 
 export default function VentaForm({ onConfirm }: VentaFormProps) {
+	const { toast } = useToast();
 	const [cantidad, setCantidad] = useState(0);
 	const [total, setTotal] = useState(0);
 	const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
@@ -32,10 +35,19 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 				move_date: fecha,
 				notes: `Venta directa: ${cantidad} garrafones`,
 			});
+			toast({
+				title: 'Éxito',
+				message: 'Registro de venta guardado correctamente.',
+				type: 'success',
+			});
 			onConfirm();
 		} catch (error) {
-			console.error('Error saving sale:', error);
-			alert('Error al guardar el registro. Por favor, intente de nuevo.');
+			toast({
+				title: 'Error',
+				message:
+					'Error al guardar el registro. Por favor, intente de nuevo.',
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -117,14 +129,15 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 							}}>
 							Fecha de movimiento
 						</label>
-						<input
-							type='date'
-							value={fecha}
-							onChange={(e) => setFecha(e.target.value)}
-							className='px-4 w-full border rounded-xl h-12 bg-transparent text-headline-sm font-semibold'
-							style={{
-								borderColor: 'var(--color-outline-variant)',
-								color: 'var(--color-primary)',
+						<DatePicker
+							mode='date'
+							selectionType='single'
+							value={new Date(fecha)}
+							placeholder='Selecciona la fecha'
+							onChange={(e: DatePickerValue) => {
+								if (e instanceof Date) {
+									setFecha(e.toISOString().split('T')[0]);
+								}
 							}}
 						/>
 					</div>

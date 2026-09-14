@@ -54,6 +54,9 @@ export default function AppBar() {
 
 	const handleLogout = async () => {
 		try {
+			// Clear local cookies
+			document.cookie = 'selected_warehouse_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+			
 			await fetch('/api/auth/logout', { method: 'POST' });
 			router.push('/login');
 			router.refresh();

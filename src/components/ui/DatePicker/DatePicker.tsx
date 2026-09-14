@@ -122,15 +122,17 @@ const safeParse = (
 	mode: 'date' | 'datetime',
 ): Dayjs | null => {
 	if (!val) return null;
-	let d = dayjs(val);
-	if (
-		mode === 'date' &&
-		typeof val === 'string' &&
-		val.includes('T00:00:00.000Z')
-	) {
-		return dayjs.utc(val).local();
+	if (mode === 'date') {
+		if (typeof val === 'string') {
+			if (val.includes('T00:00:00')) {
+				return dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+			}
+			return dayjs(val);
+		} else if (val instanceof Date) {
+			return dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+		}
 	}
-	return d;
+	return dayjs(val);
 };
 
 const CalendarPanel: React.FC<DatePickerProps> = ({
@@ -294,8 +296,8 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 			/>
 
 			{/* Header */}
-			<div className='flex items-center justify-between px-6 py-5 bg-white'>
-				<div className='text-[#003b5c] font-semibold text-lg capitalize'>
+			<div className='flex items-center justify-between px-3 py-1 bg-white'>
+				<div className='text-[#003b5c] font-semibold text-md capitalize'>
 					{currentMonth.format('MMMM YYYY')}
 				</div>
 				<div className='flex items-center gap-1'>
@@ -313,9 +315,9 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 			</div>
 
 			{/* Calendar */}
-			<div className='px-6 pb-2'>
+			<div className='px-3 pb-1'>
 				{/* Weekdays */}
-				<div className='grid grid-cols-7 mb-2'>
+				<div className='grid grid-cols-7 mb-1'>
 					{WEEKDAYS.map((day) => (
 						<div
 							key={day}
@@ -326,7 +328,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 				</div>
 
 				{/* Days */}
-				<div className='grid grid-cols-7 gap-y-2'>
+				<div className='grid grid-cols-7 gap-y-1'>
 					{daysInMonth.map((day, i) => {
 						const isCurrentMonth = day.isSame(
 							currentMonth,
@@ -360,7 +362,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 								<button
 									onClick={() => handleDayClick(day)}
 									className={`
-										relative z-10 w-8 h-8 rounded-md flex items-center justify-center text-[14px] transition-colors
+										relative z-10 w-8 h-8 rounded-md flex items-center justify-center text-md transition-colors
 										${selected ? 'bg-[#003b5c] text-white font-semibold' : 'font-medium'}
 										${!selected && isCurrentMonth ? 'text-[#003b5c] hover:bg-slate-100' : ''}
 										${!selected && !isCurrentMonth ? 'text-slate-300 hover:bg-slate-50' : ''}
@@ -375,8 +377,8 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 
 				{/* Time Selector based on design */}
 				{mode === 'datetime' && (
-					<div className='mt-6'>
-						<div className='text-center mb-4'>
+					<div className='mt-1'>
+						<div className='text-center mb-1'>
 							<p className='text-[10px] font-bold text-slate-500 tracking-widest uppercase mb-1'>
 								Hora Seleccionada
 							</p>
@@ -394,7 +396,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 						{selectionType === 'single' ? (
 							<div className='flex bg-[#f8fafd] rounded-md overflow-hidden h-48 border border-slate-100 relative'>
 								<div className='flex-1 flex flex-col'>
-									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-white z-10'>
+									<div className='text-[10px] font-bold text-slate-400 text-center py-1 bg-white z-10'>
 										HH
 									</div>
 									<ScrollColumn
@@ -412,7 +414,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 									/>
 								</div>
 								<div className='flex-1 flex flex-col border-l border-slate-100'>
-									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-white z-10'>
+									<div className='text-[10px] font-bold text-slate-400 text-center py-1 bg-white z-10'>
 										MM
 									</div>
 									<ScrollColumn
@@ -499,7 +501,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 			</div>
 
 			{/* Footer Actions */}
-			<div className='flex flex-col px-6 py-4 gap-2 bg-white'>
+			<div className='flex flex-col px-3 py-1 gap-2 bg-white'>
 				<button
 					onClick={handleApply}
 					className='w-full bg-[#003b5c] text-white font-semibold text-sm py-3 rounded-lg hover:bg-[#002a42] transition-colors'>
@@ -567,12 +569,14 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
 			if (!val) return '';
 			let d = dayjs(val);
 			if (props.mode === 'date') {
-				if (typeof val === 'string' && val.includes('T00:00:00')) {
-					d = dayjs.utc(val);
-				} else if (val instanceof Date) {
-					if (d.hour() > 12) {
-						d = d.add(1, 'day');
+				if (typeof val === 'string') {
+					if (val.includes('T00:00:00')) {
+						d = dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+					} else {
+						d = dayjs(val);
 					}
+				} else if (val instanceof Date) {
+					d = dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
 				}
 			}
 			return d.format(formatStr);
@@ -612,7 +616,7 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
 			{isOpen && (
 				<div
 					ref={popoverRef}
-					className={`absolute left-0 z-50 ${popoverPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+					className={`absolute left-0 z-100 ${popoverPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
 					<CalendarPanel
 						{...props}
 						className=''

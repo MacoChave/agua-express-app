@@ -5,16 +5,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 import WaterDrop from '@/assets/icons/water_drop.svg';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export default function LoginPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const { toast } = useToast();
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
-		setError(null);
 
 		const formData = new FormData(e.currentTarget);
 		const email = formData.get('email');
@@ -38,7 +38,11 @@ export default function LoginPage() {
 			router.push('/dashboard');
 			router.refresh();
 		} catch (err: any) {
-			setError(err.message);
+			toast({
+				title: 'Error',
+				message: err.message,
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -90,11 +94,6 @@ export default function LoginPage() {
 				</div>
 
 				<div className='px-8 py-8'>
-					{error && (
-						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
-							{error}
-						</div>
-					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<InputField
 							id='email'
