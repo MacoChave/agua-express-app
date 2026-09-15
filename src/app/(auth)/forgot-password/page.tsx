@@ -4,17 +4,15 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 import WaterDrop from '@/assets/icons/water_drop.svg';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export default function ForgotPasswordPage() {
+	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState(false);
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
-		setError(null);
-		setSuccess(false);
 
 		const formData = new FormData(e.currentTarget);
 		const email = formData.get('email');
@@ -32,9 +30,18 @@ export default function ForgotPasswordPage() {
 				throw new Error(data.error || 'Error al enviar el correo');
 			}
 
-			setSuccess(true);
+			toast({
+				title: 'Éxito',
+				message:
+					'Se ha enviado un enlace de recuperación a tu correo electrónico.',
+				type: 'success',
+			});
 		} catch (err: any) {
-			setError(err.message);
+			toast({
+				title: 'Error',
+				message: err.message,
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -86,17 +93,6 @@ export default function ForgotPasswordPage() {
 				</div>
 
 				<div className='px-8 py-8'>
-					{error && (
-						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
-							{error}
-						</div>
-					)}
-					{success && (
-						<div className='mb-6 p-4 rounded-lg bg-primary-container text-on-primary-container text-body-sm'>
-							Se ha enviado un enlace de recuperación a tu correo
-							electrónico.
-						</div>
-					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<InputField
 							id='email'

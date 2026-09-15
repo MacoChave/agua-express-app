@@ -6,33 +6,42 @@ import CloudUpload from '@/assets/icons/cloud_upload.svg';
 import { InputField } from '@/components/ui';
 import { apiClient } from '@/lib/apiClient';
 import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/components/ui/Toast/ToastContext';
+import DatePicker, { DatePickerValue } from '@/components/ui/DatePicker/DatePicker';
+import { ExpenseType } from '@/types/database';
 
 interface GastoFormProps {
 	onConfirm: () => void;
 }
 
 export default function GastoForm({ onConfirm }: GastoFormProps) {
+	const { toast } = useToast();
 	const [tipoGasto, setTipoGasto] = useState('');
 	const [monto, setMonto] = useState(0);
+	const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
 	const [archivo, setArchivo] = useState<File | null>(null);
 	const [loading, setLoading] = useState(false);
-	const [expenseTypes, setExpenseTypes] = useState<any[]>([]);
+	const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
 	const [loadingTypes, setLoadingTypes] = useState(true);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		async function fetchExpenseTypes() {
 			try {
-				const data = await apiClient.get<any[]>('/expense-types');
+				const data = await apiClient.get<ExpenseType[]>('/expense-types');
 				setExpenseTypes(data);
-			} catch (error) {
-				console.error('Error fetching expense types:', error);
+			} catch {
+				toast({
+					title: 'Error',
+					message: 'No se pudieron cargar los tipos de gasto.',
+					type: 'error',
+				});
 			} finally {
 				setLoadingTypes(false);
 			}
 		}
 		fetchExpenseTypes();
-	}, []);
+	}, [toast]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -45,8 +54,12 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 	};
 
 	const handleSave = async () => {
-		if (!tipoGasto || !monto) {
-			alert('Por favor complete los campos obligatorios.');
+		if (!tipoGasto || !monto || !fecha) {
+			toast({
+				title: 'Error',
+				message: 'Por favor complete los campos obligatorios.',
+				type: 'warning',
+			});
 			return;
 		}
 
@@ -67,10 +80,12 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 					.upload(filePath, archivo);
 
 				if (uploadError) {
-					console.error('Error uploading file:', uploadError);
-					alert(
-						'Error al subir la evidencia. Por favor intente de nuevo.',
-					);
+					toast({
+						title: 'Error',
+						message:
+							'Error al subir la evidencia. Por favor intente de nuevo.',
+						type: 'error',
+					});
 					setLoading(false);
 					return;
 				}
@@ -81,6 +96,11 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 					.getPublicUrl(filePath);
 
 				evidenceUrl = publicUrlData.publicUrl;
+				toast({
+					title: 'Éxito',
+					message: 'Evidencia subida correctamente.',
+					type: 'success',
+				});
 			}
 
 			await apiClient.post('/inventory-movements', {
@@ -88,14 +108,23 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 				quantity: 1, // Un gasto suele ser una unidad
 				price: monto,
 				expense_type_id: tipoGasto,
-				move_date: new Date().toISOString().split('T')[0],
+				move_date: fecha,
 				notes: `Registro de gasto: ${tipoGasto}`,
 				evidence: evidenceUrl,
 			});
+			toast({
+				title: 'Éxito',
+				message: 'Gasto guardado correctamente.',
+				type: 'success',
+			});
 			onConfirm();
-		} catch (error) {
-			console.error('Error saving expense:', error);
-			alert('Error al guardar el gasto. Por favor, intente de nuevo.');
+		} catch {
+			toast({
+				title: 'Error',
+				message:
+					'Error al guardar el gasto. Por favor, intente de nuevo.',
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -149,6 +178,24 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						</select>
 					</div>
 
+					{/* Fecha del Gasto */}
+					<div className='flex flex-col gap-1'>
+						<label className='text-label-md text-[var(--color-on-surface-variant)]'>
+							Fecha
+						</label>
+						<DatePicker
+							mode='date'
+							selectionType='single'
+							value={new Date(fecha)}
+							placeholder='Selecciona la fecha'
+							onChange={(e: DatePickerValue) => {
+								if (e instanceof Date) {
+									setFecha(e.toISOString().split('T')[0]);
+								}
+							}}
+						/>
+					</div>
+
 					{/* Monto del Gasto */}
 					<InputField
 						label='Monto del gasto'
@@ -156,7 +203,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						placeholder='200'
 						value={monto === 0 ? '' : monto}
 						onChange={(e) => {
-							let value = parseFloat(e.target.value);
+							const value = parseFloat(e.target.value);
 							if (!isNaN(value)) setMonto(value);
 							else setMonto(0);
 						}}

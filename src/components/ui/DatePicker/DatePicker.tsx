@@ -122,15 +122,17 @@ const safeParse = (
 	mode: 'date' | 'datetime',
 ): Dayjs | null => {
 	if (!val) return null;
-	let d = dayjs(val);
-	if (
-		mode === 'date' &&
-		typeof val === 'string' &&
-		val.includes('T00:00:00.000Z')
-	) {
-		return dayjs.utc(val).local();
+	if (mode === 'date') {
+		if (typeof val === 'string') {
+			if (val.includes('T00:00:00')) {
+				return dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+			}
+			return dayjs(val);
+		} else if (val instanceof Date) {
+			return dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+		}
 	}
-	return d;
+	return dayjs(val);
 };
 
 const CalendarPanel: React.FC<DatePickerProps> = ({
@@ -149,6 +151,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 		if (selectionType === 'single') {
 			if (value && !Array.isArray(value)) {
 				const d = safeParse(value, mode);
+				// eslint-disable-next-line
 				setDraftStart(d);
 				if (d) setCurrentMonth(d.startOf('month'));
 			} else {
@@ -284,7 +287,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 
 	return (
 		<div
-			className={`w-[340px] bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.1)] border border-slate-200 overflow-hidden font-sans select-none ${className}`}>
+			className={`bg-white rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.1)] border border-slate-200 overflow-hidden font-sans select-none ${className} ${mode === 'datetime' ? 'w-[350px] sm:w-[450px]' : 'w-[300px]'}`}>
 			<style
 				dangerouslySetInnerHTML={{
 					__html: `
@@ -293,94 +296,105 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 				}}
 			/>
 
-			{/* Header */}
-			<div className='flex items-center justify-between px-6 py-5 bg-white'>
-				<div className='text-[#003b5c] font-semibold text-lg capitalize'>
-					{currentMonth.format('MMMM YYYY')}
-				</div>
-				<div className='flex items-center gap-1'>
-					<button
-						onClick={prevMonth}
-						className='text-[#003b5c] hover:bg-slate-100 p-1.5 rounded transition-colors'>
-						<ChevronLeft />
-					</button>
-					<button
-						onClick={nextMonth}
-						className='text-[#003b5c] hover:bg-slate-100 p-1.5 rounded transition-colors'>
-						<ChevronRight />
-					</button>
-				</div>
-			</div>
-
-			{/* Calendar */}
-			<div className='px-6 pb-2'>
-				{/* Weekdays */}
-				<div className='grid grid-cols-7 mb-2'>
-					{WEEKDAYS.map((day) => (
-						<div
-							key={day}
-							className='text-center text-[11px] font-bold text-slate-500 uppercase tracking-wide'>
-							{day}
+			<div
+				className={`flex flex-col ${mode === 'datetime' ? 'flex-row' : ''}`}>
+				{/* Left Side: Calendar */}
+				<div className='w-[200px] sm:w-[300px] shrink-0'>
+					{/* Header */}
+					<div className='flex items-center justify-between px-3 py-2 bg-white'>
+						<div className='text-[#003b5c] font-semibold text-md capitalize'>
+							{currentMonth.format('MMMM YYYY')}
 						</div>
-					))}
-				</div>
+						<div className='flex items-center gap-1'>
+							<button
+								type='button'
+								onClick={prevMonth}
+								className='text-[#003b5c] hover:bg-slate-100 p-1.5 rounded transition-colors'>
+								<ChevronLeft />
+							</button>
+							<button
+								type='button'
+								onClick={nextMonth}
+								className='text-[#003b5c] hover:bg-slate-100 p-1.5 rounded transition-colors'>
+								<ChevronRight />
+							</button>
+						</div>
+					</div>
 
-				{/* Days */}
-				<div className='grid grid-cols-7 gap-y-2'>
-					{daysInMonth.map((day, i) => {
-						const isCurrentMonth = day.isSame(
-							currentMonth,
-							'month',
-						);
-						const selected = isSelected(day);
-						const between = isBetweenDates(day);
-						const rangeStart = isRangeStart(day);
-						const rangeEnd = isRangeEnd(day);
+					{/* Calendar */}
+					<div className='px-3 pb-3'>
+						{/* Weekdays */}
+						<div className='grid grid-cols-7 mb-1'>
+							{WEEKDAYS.map((day) => (
+								<div
+									key={day}
+									className='text-center text-xs font-bold text-slate-500 uppercase tracking-wide'>
+									{day}
+								</div>
+							))}
+						</div>
 
-						return (
-							<div
-								key={i}
-								className='relative flex justify-center items-center h-10'>
-								{selectionType === 'range' &&
-									draftStart &&
-									draftEnd && (
-										<>
-											{between && (
-												<div className='absolute inset-0 bg-[#e6f0fa]' />
-											)}
-											{rangeStart && !rangeEnd && (
-												<div className='absolute right-0 w-1/2 h-full bg-[#e6f0fa]' />
-											)}
-											{rangeEnd && !rangeStart && (
-												<div className='absolute left-0 w-1/2 h-full bg-[#e6f0fa]' />
-											)}
-										</>
-									)}
+						{/* Days */}
+						<div className='grid grid-cols-7 gap-y-1'>
+							{daysInMonth.map((day, i) => {
+								const isCurrentMonth = day.isSame(
+									currentMonth,
+									'month',
+								);
+								const selected = isSelected(day);
+								const between = isBetweenDates(day);
+								const rangeStart = isRangeStart(day);
+								const rangeEnd = isRangeEnd(day);
 
-								<button
-									onClick={() => handleDayClick(day)}
-									className={`
-										relative z-10 w-8 h-8 rounded-md flex items-center justify-center text-[14px] transition-colors
+								return (
+									<div
+										key={i}
+										className='relative flex justify-center items-center h-10'>
+										{selectionType === 'range' &&
+											draftStart &&
+											draftEnd && (
+												<>
+													{between && (
+														<div className='absolute inset-0 bg-[#e6f0fa]' />
+													)}
+													{rangeStart &&
+														!rangeEnd && (
+															<div className='absolute right-0 w-1/2 h-full bg-[#e6f0fa]' />
+														)}
+													{rangeEnd &&
+														!rangeStart && (
+															<div className='absolute left-0 w-1/2 h-full bg-[#e6f0fa]' />
+														)}
+												</>
+											)}
+
+										<button
+											type='button'
+											onClick={() => handleDayClick(day)}
+											className={`
+										relative z-10 w-8 h-8 rounded-md flex items-center justify-center text-sm transition-colors
 										${selected ? 'bg-[#003b5c] text-white font-semibold' : 'font-medium'}
 										${!selected && isCurrentMonth ? 'text-[#003b5c] hover:bg-slate-100' : ''}
 										${!selected && !isCurrentMonth ? 'text-slate-300 hover:bg-slate-50' : ''}
 										${between && !selected ? 'text-[#003b5c]' : ''}
 									`}>
-									{day.date()}
-								</button>
-							</div>
-						);
-					})}
+											{day.date()}
+										</button>
+									</div>
+								);
+							})}
+						</div>
+					</div>
 				</div>
 
 				{/* Time Selector based on design */}
 				{mode === 'datetime' && (
-					<div className='mt-6'>
+					<div className='w-[150px] p-1 border-t sm:border-t-0 sm:border-l border-slate-200 flex flex-col justify-center bg-slate-50/30'>
 						<div className='text-center mb-4'>
-							<p className='text-[10px] font-bold text-slate-500 tracking-widest uppercase mb-1'>
+							<p className='text-xs font-bold text-slate-500 tracking-widest uppercase mb-1'>
 								Hora Seleccionada
 							</p>
-							<p className='text-2xl font-medium text-[#003b5c]'>
+							<p className='text-md font-medium text-[#003b5c]'>
 								{String(
 									draftStart ? draftStart.hour() : 0,
 								).padStart(2, '0')}{' '}
@@ -392,10 +406,10 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 						</div>
 
 						{selectionType === 'single' ? (
-							<div className='flex bg-[#f8fafd] rounded-md overflow-hidden h-48 border border-slate-100 relative'>
+							<div className='flex bg-white rounded-xl overflow-hidden h-48 border border-slate-200 shadow-sm relative'>
 								<div className='flex-1 flex flex-col'>
-									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-white z-10'>
-										HH
+									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-slate-50/80 z-10 border-b border-slate-100 uppercase tracking-widest'>
+										Hora
 									</div>
 									<ScrollColumn
 										items={hours}
@@ -412,8 +426,8 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 									/>
 								</div>
 								<div className='flex-1 flex flex-col border-l border-slate-100'>
-									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-white z-10'>
-										MM
+									<div className='text-[10px] font-bold text-slate-400 text-center py-2 bg-slate-50/80 z-10 border-b border-slate-100 uppercase tracking-widest'>
+										Min
 									</div>
 									<ScrollColumn
 										items={minutes}
@@ -430,10 +444,10 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 									/>
 								</div>
 								{/* Center highlight bar */}
-								<div className='absolute top-1/2 left-0 w-full h-8 -mt-4 bg-[#dbeef9]/30 pointer-events-none' />
+								<div className='absolute top-1/2 left-0 w-full h-8 -mt-4 bg-[#dbeef9]/40 pointer-events-none border-y border-[#dbeef9]/60' />
 							</div>
 						) : (
-							<div className='flex flex-col gap-4 px-2'>
+							<div className='flex flex-col gap-4'>
 								<div className='flex justify-between items-center gap-4'>
 									<div className='flex-1'>
 										<p className='text-[10px] font-bold text-slate-500 mb-1'>
@@ -499,20 +513,22 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 			</div>
 
 			{/* Footer Actions */}
-			<div className='flex flex-col px-6 py-4 gap-2 bg-white'>
+			<div className='flex px-4 py-3 gap-3 bg-white border-t border-slate-100 justify-end'>
 				<button
+					type='button'
+					onClick={onCancel}
+					className='text-[#003b5c] font-semibold text-sm px-6 py-2 hover:bg-slate-50 rounded-lg transition-colors'>
+					CANCELAR
+				</button>
+				<button
+					type='button'
 					onClick={handleApply}
-					className='w-full bg-[#003b5c] text-white font-semibold text-sm py-3 rounded-lg hover:bg-[#002a42] transition-colors'>
+					className='bg-[#003b5c] text-white font-semibold text-sm px-8 py-2 rounded-lg hover:bg-[#002a42] transition-colors'>
 					{mode === 'datetime'
 						? 'CONFIRMAR HORA'
 						: selectionType === 'single'
 							? 'CONFIRMAR FECHA'
 							: 'CONFIRMAR RANGO'}
-				</button>
-				<button
-					onClick={onCancel}
-					className='w-full text-[#003b5c] font-semibold text-sm py-3 hover:bg-slate-50 rounded-lg transition-colors'>
-					CANCELAR
 				</button>
 			</div>
 		</div>
@@ -563,16 +579,18 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
 		const formatStr =
 			props.mode === 'datetime' ? 'DD/MM/YYYY HH:mm' : 'DD/MM/YYYY';
 
-		const formatVal = (val: any) => {
+		const formatVal = (val: Date | string | null) => {
 			if (!val) return '';
 			let d = dayjs(val);
 			if (props.mode === 'date') {
-				if (typeof val === 'string' && val.includes('T00:00:00')) {
-					d = dayjs.utc(val);
-				} else if (val instanceof Date) {
-					if (d.hour() > 12) {
-						d = d.add(1, 'day');
+				if (typeof val === 'string') {
+					if (val.includes('T00:00:00')) {
+						d = dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
+					} else {
+						d = dayjs(val);
 					}
+				} else if (val instanceof Date) {
+					d = dayjs(dayjs.utc(val).format('YYYY-MM-DD'));
 				}
 			}
 			return d.format(formatStr);
@@ -612,7 +630,7 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
 			{isOpen && (
 				<div
 					ref={popoverRef}
-					className={`absolute left-0 z-50 ${popoverPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+					className={`absolute left-0 z-100 ${popoverPosition === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
 					<CalendarPanel
 						{...props}
 						className=''

@@ -8,13 +8,21 @@ import VentaForm from '@/features/pedidos/components/VentaForm';
 import GastoForm from '@/features/pedidos/components/GastoForm';
 
 /* ── Componente ─────────────────────────────────────────── */
-export default function AnadirPedidoPage() {
+export function AnadirPedidoManager({ onClose }: { onClose?: () => void }) {
 	const router = useRouter();
 	const [tab, setTab] = useState<'venta' | 'gasto'>('venta');
 
 	const handleConfirmar = () => {
 		// Simulación de guardado
-		setTimeout(() => router.push('/pedidos'), 1000);
+		setTimeout(() => {
+			if (onClose) onClose();
+			else router.push('/pedidos');
+		}, 1000);
+	};
+
+	const handleVolver = () => {
+		if (onClose) onClose();
+		else router.back();
 	};
 
 	return (
@@ -30,7 +38,7 @@ export default function AnadirPedidoPage() {
 				}}>
 				<div className='flex items-center gap-3'>
 					<button
-						onClick={() => router.back()}
+						onClick={handleVolver}
 						className='w-10 h-10 flex items-center justify-center rounded-full transition-colors hover:bg-surface-container active:scale-90'
 						aria-label='Volver'>
 						<ArrowBack className='w-5 h-5' />
@@ -62,8 +70,7 @@ export default function AnadirPedidoPage() {
 							tab === 'venta'
 								? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] shadow-md'
 								: 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-high)]'
-						}`}
-					>
+						}`}>
 						Venta
 					</button>
 					<button
@@ -72,8 +79,7 @@ export default function AnadirPedidoPage() {
 							tab === 'gasto'
 								? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] shadow-md'
 								: 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-high)]'
-						}`}
-					>
+						}`}>
 						Gasto
 					</button>
 				</div>

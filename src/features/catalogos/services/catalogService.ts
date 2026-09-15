@@ -5,7 +5,7 @@ import {
 	MaintenanceType,
 	Warehouse,
 } from '@/types/database';
-import { CatalogItem, CatalogType } from '../types';
+import { CatalogItem, CatalogType, CatalogFormData } from '../types';
 
 export const catalogService = {
 	async getWarehouses(): Promise<Warehouse[]> {
@@ -63,7 +63,7 @@ export const catalogService = {
 		await apiClient.delete(`${endpoint}/${id}`);
 	},
 
-	async createItem(type: CatalogType, data: any): Promise<any> {
+	async createItem(type: CatalogType, data: CatalogFormData): Promise<unknown> {
 		const endpoint =
 			type === 'gasto'
 				? '/expense-types'
@@ -76,8 +76,8 @@ export const catalogService = {
 	async updateItem(
 		type: CatalogType,
 		id: string | number,
-		data: any,
-	): Promise<any> {
+		data: CatalogFormData,
+	): Promise<unknown> {
 		const endpoint =
 			type === 'gasto'
 				? '/expense-types'

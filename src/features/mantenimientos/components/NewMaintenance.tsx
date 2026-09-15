@@ -3,10 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { apiClient } from '@/lib/apiClient';
+import { Equipment, MaintenanceType } from '@/types/database';
 
 import Close from '@/assets/icons/close.svg';
 import AddAPhoto from '@/assets/icons/add_a_photo.svg';
 import type { TaskStatus } from '@/features/mantenimientos/types';
+import DatePicker, {
+	DatePickerValue,
+} from '@/components/ui/DatePicker/DatePicker';
 
 /* ── StatusBadge ─────────────────────────────────────────── */
 export function StatusBadge({ status }: { status: TaskStatus }) {
@@ -31,22 +35,18 @@ export function StatusBadge({ status }: { status: TaskStatus }) {
 }
 
 export interface NewMaintenanceModalProps {
-	open: boolean;
 	onClose: () => void;
 }
 
-export function NewMaintenanceModal({
-	open,
-	onClose,
-}: NewMaintenanceModalProps) {
-	const [equipments, setEquipments] = useState<any[]>([]);
-	const [maintenanceTypes, setMaintenanceTypes] = useState<any[]>([]);
+export function NewMaintenanceModal({ onClose }: NewMaintenanceModalProps) {
+	const [equipments, setEquipments] = useState<Equipment[]>([]);
+	const [maintenanceTypes, setMaintenanceTypes] = useState<MaintenanceType[]>([]);
 	const [loadingData, setLoadingData] = useState(true);
 
 	const [equipment, setEquipment] = useState('');
 	const [taskType, setTaskType] = useState('');
 	const [notes, setNotes] = useState('');
-	const [date, setDate] = useState(new Date().toISOString().slice(0, 16));
+	const [date, setDate] = useState<Date>(new Date());
 
 	const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
 	const [evidencePreview, setEvidencePreview] = useState<string | null>(null);
@@ -58,8 +58,8 @@ export function NewMaintenanceModal({
 		async function fetchData() {
 			try {
 				const [eqRes, typeRes] = await Promise.all([
-					apiClient.get<any[]>('/equipment'),
-					apiClient.get<any[]>('/maintenance-types'),
+					apiClient.get<Equipment[]>('/equipment'),
+					apiClient.get<MaintenanceType[]>('/maintenance-types'),
 				]);
 				setEquipments(eqRes);
 				setMaintenanceTypes(typeRes);
@@ -75,17 +75,8 @@ export function NewMaintenanceModal({
 			}
 		}
 
-		if (open) {
-			fetchData();
-			const handler = (e: KeyboardEvent) => {
-				if (e.key === 'Escape') onClose();
-			};
-			window.addEventListener('keydown', handler);
-			return () => window.removeEventListener('keydown', handler);
-		}
-	}, [open, onClose]);
-
-	if (!open) return null;
+		fetchData();
+	}, [onClose]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -128,7 +119,7 @@ export function NewMaintenanceModal({
 			await apiClient.post('/maintenance-tasks/complete', {
 				equipment_id: Number(equipment),
 				maintenance_type_id: Number(taskType),
-				date: date.split('T')[0], // Enviar solo la fecha si así se requiere, o completa si la base de datos lo soporta
+				date: date.toISOString(), // Enviar la fecha completa
 				notes,
 				evidence: evidenceUrl,
 			});
@@ -147,177 +138,156 @@ export function NewMaintenanceModal({
 	}
 
 	return (
-		<div
-			className='fixed inset-0 z-[60] flex items-center justify-center p-4 backdrop-blur-sm'
-			style={{ backgroundColor: 'rgba(11,28,48,0.4)' }}
-			onClick={(e) => e.target === e.currentTarget && onClose()}>
-			<div
-				className='bg-[var(--color-surface-container-lowest)] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden'
-				onClick={(e) => e.stopPropagation()}>
-				{/* Header */}
-				<div className='p-6 border-b border-[var(--color-outline-variant)] flex justify-between items-center bg-[var(--color-primary)] text-[var(--color-on-primary)]'>
-					<h3 className='text-headline-sm font-semibold'>
-						Registrar Nuevo Mantenimiento
-					</h3>
-					<button
-						onClick={onClose}
-						className='p-2 hover:bg-white/10 rounded-full transition-colors'
-						aria-label='Cerrar'>
-						<Close className='w-5 h-5' />
-					</button>
+		<form className='space-y-6' onSubmit={handleSubmit}>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+				{/* Equipo */}
+				<div className='space-y-1'>
+					<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+						Equipo
+					</label>
+					<select
+						className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)] disabled:opacity-50'
+						value={equipment}
+						onChange={(e) => setEquipment(e.target.value)}
+						disabled={loadingData || equipments.length === 0}>
+						{loadingData ? (
+							<option value=''>Cargando...</option>
+						) : equipments.length === 0 ? (
+							<option value=''>No hay equipos</option>
+						) : (
+							equipments.map((eq) => (
+								<option key={eq.id} value={eq.id}>
+									{eq.name}
+								</option>
+							))
+						)}
+					</select>
 				</div>
 
-				{/* Form */}
-				<form className='p-6 space-y-6' onSubmit={handleSubmit}>
-					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-						{/* Equipo */}
-						<div className='space-y-1'>
-							<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-								Equipo
-							</label>
-							<select
-								className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)] disabled:opacity-50'
-								value={equipment}
-								onChange={(e) => setEquipment(e.target.value)}
-								disabled={
-									loadingData || equipments.length === 0
-								}>
-								{loadingData ? (
-									<option value=''>Cargando...</option>
-								) : equipments.length === 0 ? (
-									<option value=''>No hay equipos</option>
-								) : (
-									equipments.map((eq) => (
-										<option key={eq.id} value={eq.id}>
-											{eq.name}
-										</option>
-									))
-								)}
-							</select>
-						</div>
-
-						{/* Tipo de Mantenimiento */}
-						<div className='space-y-1'>
-							<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-								Tipo de Mantenimiento
-							</label>
-							<select
-								className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)] disabled:opacity-50'
-								value={taskType}
-								onChange={(e) => setTaskType(e.target.value)}
-								disabled={
-									loadingData || maintenanceTypes.length === 0
-								}>
-								{loadingData ? (
-									<option value=''>Cargando...</option>
-								) : maintenanceTypes.length === 0 ? (
-									<option value=''>No hay tipos</option>
-								) : (
-									maintenanceTypes.map((type) => (
-										<option key={type.id} value={type.id}>
-											{type.name}
-										</option>
-									))
-								)}
-							</select>
-						</div>
-					</div>
-
-					{/* Fecha y Hora */}
-					<div className='space-y-1'>
-						<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-							Fecha y Hora
-						</label>
-						<input
-							type='datetime-local'
-							className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)]'
-							value={date}
-							onChange={(e) => setDate(e.target.value)}
-						/>
-					</div>
-
-					{/* Observaciones */}
-					<div className='space-y-1'>
-						<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-							Observaciones del Técnico
-						</label>
-						<textarea
-							className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] p-4 text-body-md text-[var(--color-on-surface)] resize-none'
-							placeholder='Detalle cualquier anomalía detectada durante el proceso...'
-							rows={3}
-							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
-						/>
-					</div>
-
-					{/* Evidencia Fotográfica */}
-					<div className='space-y-1'>
-						<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
-							Evidencia Fotográfica
-						</label>
-
-						<input
-							type='file'
-							accept='image/*'
-							capture='environment'
-							ref={fileInputRef}
-							className='hidden'
-							onChange={handleFileChange}
-						/>
-
-						{evidencePreview ? (
-							<div className='relative rounded-xl overflow-hidden border-2 border-[var(--color-outline-variant)]'>
-								<img
-									src={evidencePreview}
-									alt='Evidencia'
-									className='w-full h-48 object-cover'
-								/>
-								<button
-									type='button'
-									onClick={() => {
-										setEvidenceFile(null);
-										setEvidencePreview(null);
-									}}
-									className='absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors'>
-									<Close className='w-4 h-4' />
-								</button>
-							</div>
+				{/* Tipo de Mantenimiento */}
+				<div className='space-y-1'>
+					<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+						Tipo de Mantenimiento
+					</label>
+					<select
+						className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] h-12 px-3 text-body-md text-[var(--color-on-surface)] disabled:opacity-50'
+						value={taskType}
+						onChange={(e) => setTaskType(e.target.value)}
+						disabled={loadingData || maintenanceTypes.length === 0}>
+						{loadingData ? (
+							<option value=''>Cargando...</option>
+						) : maintenanceTypes.length === 0 ? (
+							<option value=''>No hay tipos</option>
 						) : (
-							<div
-								onClick={() => fileInputRef.current?.click()}
-								className='border-2 border-dashed border-[var(--color-outline-variant)] rounded-xl p-8 flex flex-col items-center justify-center hover:bg-[var(--color-surface-container)] transition-colors cursor-pointer group'>
-								<AddAPhoto className='w-8 h-8 text-[var(--color-outline-variant)] mb-2' />
-								<p className='text-body-md text-[var(--color-on-surface-variant)]'>
-									Tomar foto o subir imagen
-								</p>
-								<p className='text-label-md text-[var(--color-outline)]'>
-									JPG, PNG hasta 5MB
-								</p>
-							</div>
+							maintenanceTypes.map((type) => (
+								<option key={type.id} value={type.id}>
+									{type.name}
+								</option>
+							))
 						)}
-					</div>
+					</select>
+				</div>
+			</div>
 
-					{/* Actions */}
-					<div className='pt-2 flex gap-4'>
+			{/* Fecha y Hora */}
+			<div className='space-y-1 relative'>
+				<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+					Fecha y Hora
+				</label>
+				<DatePicker
+					mode='datetime'
+					selectionType='single'
+					value={date}
+					placeholder='Selecciona fecha y hora'
+					onChange={(e: DatePickerValue) => {
+						if (e instanceof Date) {
+							setDate(e);
+						}
+					}}
+				/>
+			</div>
+
+			{/* Observaciones */}
+			<div className='space-y-1'>
+				<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+					Observaciones del Técnico
+				</label>
+				<textarea
+					className='w-full bg-[var(--color-surface-container)] border-none rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] p-2 text-body-md text-[var(--color-on-surface)] resize-none'
+					placeholder='Detalle cualquier anomalía detectada durante el proceso...'
+					rows={3}
+					value={notes}
+					onChange={(e) => setNotes(e.target.value)}
+				/>
+			</div>
+
+			{/* Evidencia Fotográfica */}
+			<div className='space-y-1'>
+				<label className='text-label-md font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide'>
+					Evidencia Fotográfica
+				</label>
+
+				<input
+					type='file'
+					accept='image/*'
+					capture='environment'
+					ref={fileInputRef}
+					className='hidden'
+					onChange={handleFileChange}
+				/>
+
+				{evidencePreview ? (
+					<div className='relative rounded-xl overflow-hidden border-2 border-[var(--color-outline-variant)]'>
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img
+							src={evidencePreview}
+							alt='Evidencia'
+							className='w-full h-48 object-cover'
+						/>
 						<button
 							type='button'
-							onClick={onClose}
-							className='flex-1 py-3 font-bold border border-[var(--color-primary)] text-[var(--color-primary)] rounded-xl hover:bg-[var(--color-surface-container)] transition-all'>
-							Cancelar
-						</button>
-						<button
-							type='submit'
-							disabled={
-								submitting ||
-								equipments.length === 0 ||
-								maintenanceTypes.length === 0
-							}
-							className='flex-1 py-3 font-bold bg-[var(--color-primary)] text-[var(--color-on-primary)] rounded-xl hover:opacity-90 shadow-lg transition-all disabled:opacity-60'>
-							{submitting ? 'Guardando…' : 'Guardar Registro'}
+							onClick={() => {
+								setEvidenceFile(null);
+								setEvidencePreview(null);
+							}}
+							className='absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors'>
+							<Close className='w-4 h-4' />
 						</button>
 					</div>
-				</form>
+				) : (
+					<div
+						onClick={() => fileInputRef.current?.click()}
+						className='border-2 border-dashed border-[var(--color-outline-variant)] rounded-xl p-4 flex flex-col items-center justify-center hover:bg-[var(--color-surface-container)] transition-colors cursor-pointer group'>
+						<AddAPhoto className='w-8 h-8 text-[var(--color-outline-variant)] mb-2' />
+						<p className='text-body-md text-[var(--color-on-surface-variant)]'>
+							Tomar foto o subir imagen
+						</p>
+						<p className='text-label-md text-[var(--color-outline)]'>
+							JPG, PNG hasta 5MB
+						</p>
+					</div>
+				)}
 			</div>
-		</div>
+
+			{/* Actions */}
+			<div className='pt-2 flex gap-4'>
+				<button
+					type='button'
+					onClick={onClose}
+					className='flex-1 py-3 font-bold border border-[var(--color-primary)] text-[var(--color-primary)] rounded-xl hover:bg-[var(--color-surface-container)] transition-all'>
+					Cancelar
+				</button>
+				<button
+					type='submit'
+					disabled={
+						submitting ||
+						equipments.length === 0 ||
+						maintenanceTypes.length === 0
+					}
+					className='flex-1 py-3 font-bold bg-[var(--color-primary)] text-[var(--color-on-primary)] rounded-xl hover:opacity-90 shadow-lg transition-all disabled:opacity-60'>
+					{submitting ? 'Guardando…' : 'Guardar Registro'}
+				</button>
+			</div>
+		</form>
 	);
 }
