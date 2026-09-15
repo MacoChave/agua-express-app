@@ -299,7 +299,8 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 			<div
 				className={`flex flex-col ${mode === 'datetime' ? 'flex-row' : ''}`}>
 				{/* Left Side: Calendar */}
-				<div className='w-[200px] sm:w-[300px] shrink-0'>
+				<div
+					className={`w-[${mode === 'date' ? '300px' : '200px'}] sm:w-[300px] shrink-0`}>
 					{/* Header */}
 					<div className='flex items-center justify-between px-3 py-2 bg-white'>
 						<div className='text-[#003b5c] font-semibold text-md capitalize'>

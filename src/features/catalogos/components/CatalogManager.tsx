@@ -9,8 +9,9 @@ import {
 } from '../types';
 import { catalogService } from '../services/catalogService';
 import { CatalogForm } from './CatalogForm';
-import { CatalogModal } from './CatalogModal';
 import { GastoTab, EquipoTab, MantenimientoTab } from './CatalogTabs';
+import { Modal } from '@/components/ui';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export function CatalogManager() {
 	const [activeTab, setActiveTab] = useState<CatalogType>('gasto');
@@ -20,6 +21,7 @@ export function CatalogManager() {
 	// Modal state
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState<CatalogItem | null>(null);
+	const { toast } = useToast();
 
 	useEffect(() => {
 		loadItems();
@@ -31,8 +33,13 @@ export function CatalogManager() {
 		try {
 			const data = await catalogService.getItems(activeTab);
 			setItems(data);
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error loading catalog items:', error);
+			toast({
+				title: 'Error',
+				type: 'error',
+				message: error.message || 'Error al cargar los catálogos',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -53,8 +60,18 @@ export function CatalogManager() {
 			try {
 				await catalogService.deleteItem(activeTab, item.id);
 				setItems((prev) => prev.filter((i) => i.id !== item.id));
-			} catch (error) {
+				toast({
+					title: 'Eliminado',
+					type: 'success',
+					message: 'Elemento eliminado correctamente',
+				});
+			} catch (error: any) {
 				console.error('Error deleting item:', error);
+				toast({
+					title: 'Error',
+					type: 'error',
+					message: error.message || 'Error al eliminar el elemento',
+				});
 			}
 		}
 	};
@@ -71,9 +88,19 @@ export function CatalogManager() {
 				await catalogService.createItem(activeTab, formData);
 			}
 			setIsModalOpen(false);
+			toast({
+				title: 'Guardado',
+				type: 'success',
+				message: 'Elemento guardado correctamente',
+			});
 			loadItems();
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error saving item:', error);
+			toast({
+				title: 'Error',
+				type: 'error',
+				message: error.message || 'Error al guardar el elemento',
+			});
 		}
 	};
 
@@ -120,10 +147,11 @@ export function CatalogManager() {
 			</main>
 
 			{/* Modal Form */}
-			<CatalogModal
+			<Modal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				title={`${editingItem ? 'Editar' : 'Añadir'} ${metadata.entityName}`}>
+				title={`${editingItem ? 'Editar' : 'Añadir'} ${metadata.entityName}`}
+				maxWidth='md'>
 				<CatalogForm
 					entityName={metadata.entityName}
 					initialData={
@@ -135,7 +163,7 @@ export function CatalogManager() {
 					onSubmit={handleSubmit}
 					onCancel={() => setIsModalOpen(false)}
 				/>
-			</CatalogModal>
+			</Modal>
 		</div>
 	);
 }
