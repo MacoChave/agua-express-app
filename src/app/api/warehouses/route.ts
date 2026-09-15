@@ -96,7 +96,7 @@ export async function PUT(request: Request) {
 
 	const { error } = await supabase
 		.from('warehouses')
-		.update({ name, address, is_active })
+		.update({ name, address, is_active } as unknown as never)
 		.eq('company_id', companyId)
 		.eq('id', id);
 
