@@ -23,7 +23,9 @@ export function ProgramarMantenimiento({
 	onClose,
 }: ProgramarMantenimientoProps) {
 	const [equipments, setEquipments] = useState<Equipment[]>([]);
-	const [maintenanceTypes, setMaintenanceTypes] = useState<MaintenanceType[]>([]);
+	const [maintenanceTypes, setMaintenanceTypes] = useState<MaintenanceType[]>(
+		[],
+	);
 	const [loadingData, setLoadingData] = useState(true);
 
 	const [form, setForm] = useState({
@@ -49,7 +51,7 @@ export function ProgramarMantenimiento({
 					setForm((prev) => ({
 						...prev,
 						equipment: String(eqRes[0].id),
-						type: typeRes[0].id,
+						type: String(typeRes[0].id),
 					}));
 				}
 			} catch (error) {
