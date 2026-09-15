@@ -22,11 +22,14 @@ export function ProfileManager() {
 			} = await supabase.auth.getUser();
 			if (user) {
 				setEmail(user.email || '');
-				const { data: profile } = await supabase
+				const { data } = await supabase
 					.from('profiles')
 					.select('full_name')
 					.eq('id', user.id)
 					.single();
+
+				const profile = data as { full_name?: string } | null;
+
 				if (profile?.full_name) {
 					const parts = profile.full_name.trim().split(/\s+/);
 					setFirstName(parts[0] || '');
@@ -61,7 +64,8 @@ export function ProfileManager() {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err instanceof Error ? err.message : 'Error desconocido',
+				message:
+					err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setUpdateLoading(false);
@@ -109,7 +113,8 @@ export function ProfileManager() {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err instanceof Error ? err.message : 'Error desconocido',
+				message:
+					err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setLoading(false);
@@ -137,7 +142,9 @@ export function ProfileManager() {
 							label='Nombre'
 							placeholder='Tu nombre'
 							value={firstName}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement>,
+							) => setFirstName(e.target.value)}
 							required
 						/>
 						<InputField
@@ -147,7 +154,9 @@ export function ProfileManager() {
 							label='Apellido'
 							placeholder='Tu apellido'
 							value={lastName}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement>,
+							) => setLastName(e.target.value)}
 							required
 						/>
 					</div>
@@ -158,7 +167,9 @@ export function ProfileManager() {
 						label='Correo electrónico'
 						placeholder='tu@email.com'
 						value={email}
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+							setEmail(e.target.value)
+						}
 						required
 					/>
 					<div className='pt-4'>

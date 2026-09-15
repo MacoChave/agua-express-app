@@ -58,11 +58,15 @@ interface DashboardData {
 
 export function DashboardManager() {
 	const { toast } = useToast();
-	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+	const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+		null,
+	);
 	const router = useRouter();
 
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [warehouses, setWarehouses] = useState<Array<{ id: string; name: string }>>([]);
+	const [warehouses, setWarehouses] = useState<
+		Array<{ id: string; name: string }>
+	>([]);
 	const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>('');
 
 	useEffect(() => {
@@ -85,11 +89,31 @@ export function DashboardManager() {
 					.select('role, warehouse_id')
 					.eq('id', user.id)
 					.single();
-				if ((profile as { role?: string; warehouse_id?: string | number })?.role === 'admin') {
+				if (
+					(
+						profile as unknown as {
+							role?: string;
+							warehouse_id?: string | number;
+						}
+					)?.role === 'admin'
+				) {
 					setIsAdmin(true);
-					if (!match && (profile as { warehouse_id?: string | number })?.warehouse_id) {
+					if (
+						!match &&
+						(
+							profile as unknown as {
+								warehouse_id?: string | number;
+							}
+						)?.warehouse_id
+					) {
 						setSelectedWarehouseId(
-							String((profile as { warehouse_id?: string | number }).warehouse_id),
+							String(
+								(
+									profile as unknown as {
+										warehouse_id?: string | number;
+									}
+								).warehouse_id,
+							),
 						);
 					}
 					fetch('/api/warehouses')
@@ -326,7 +350,10 @@ export function DashboardManager() {
 								<div className='space-y-4'>
 									{dashboardData?.systemHealth ? (
 										dashboardData.systemHealth.map(
-											(health: SystemHealth, i: number) => (
+											(
+												health: SystemHealth,
+												i: number,
+											) => (
 												<Progress
 													key={i}
 													label={health.label}
