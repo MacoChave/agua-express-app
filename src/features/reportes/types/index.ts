@@ -1,6 +1,6 @@
 /* ── Dominio ─────────────────────────────────────────────── */
 export interface Transaction {
-	id: number;
+	id: string | number;
 	concept: string;
 	category: string;
 	time: string;
@@ -8,8 +8,8 @@ export interface Transaction {
 	icon: string;
 }
 
-/* Bar chart: [label, heightPx, active] */
-export type BarEntry = [string, number, boolean];
+/* Bar chart: [label, heightPx, active, rawValue?] */
+export type BarEntry = [string, number | string, boolean, number?];
 
 /* ── Datos estáticos ─────────────────────────────────────── */
 export const TRANSACTIONS: Transaction[] = [

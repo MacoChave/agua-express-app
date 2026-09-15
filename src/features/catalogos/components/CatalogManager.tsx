@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CatalogType, CATALOG_METADATA, CatalogItem, CatalogFormData } from '../types';
+import {
+	CatalogType,
+	CATALOG_METADATA,
+	CatalogItem,
+	CatalogFormData,
+} from '../types';
 import { catalogService } from '../services/catalogService';
 import { CatalogForm } from './CatalogForm';
 import { CatalogModal } from './CatalogModal';
@@ -121,7 +126,11 @@ export function CatalogManager() {
 				title={`${editingItem ? 'Editar' : 'Añadir'} ${metadata.entityName}`}>
 				<CatalogForm
 					entityName={metadata.entityName}
-					initialData={editingItem ? editingItem.originalData : null}
+					initialData={
+						editingItem
+							? (editingItem.originalData as unknown as Partial<CatalogFormData>)
+							: undefined
+					}
 					isEditing={!!editingItem}
 					onSubmit={handleSubmit}
 					onCancel={() => setIsModalOpen(false)}

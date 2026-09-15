@@ -21,9 +21,9 @@ export function CatalogForm({
 	entityName,
 	isEditing,
 }: CatalogFormProps) {
-	const [name, setName] = useState(initialData?.name || '');
-	const [description, setDescription] = useState(initialData?.description || '');
-	const [warehouseId, setWarehouseId] = useState(initialData?.warehouse_id || '');
+	const [name, setName] = useState<string>(initialData?.name || '');
+	const [description, setDescription] = useState<string>(initialData?.description || '');
+	const [warehouseId, setWarehouseId] = useState<string | number>(initialData?.warehouse_id || '');
 	const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 	const [loading, setLoading] = useState(false);
 
@@ -52,7 +52,9 @@ export function CatalogForm({
 				description,
 				warehouse_id: Number(warehouseId),
 				company_id: 1, // Mocked for now
-				...(initialData?.expense_type && { expense_type: initialData.expense_type }),
+				...(initialData && 'expense_type' in initialData && initialData.expense_type
+					? { expense_type: String(initialData.expense_type) }
+					: {}),
 			});
 		} catch (error) {
 			console.error('Error submitting form:', error);

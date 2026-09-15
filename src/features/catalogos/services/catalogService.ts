@@ -17,36 +17,51 @@ export const catalogService = {
 			case 'gasto': {
 				const data =
 					await apiClient.get<ExpenseType[]>('/expense-types');
-				return data.map((item) => ({
-					id: item.expense_type,
-					name: item.name,
-					description: item.description,
-					categoryLabel: `Bodega ${item.warehouse_id}`,
-					originalData: item,
-				}));
+				return data.map(
+					(item: ExpenseType): CatalogItem => ({
+						id: item.expense_type,
+						name: item.name,
+						description: item.description,
+						categoryLabel: `Bodega ${item.warehouse_id}`,
+						originalData: item as unknown as Record<
+							string,
+							unknown
+						>,
+					}),
+				);
 			}
 			case 'equipos': {
 				const data = await apiClient.get<Equipment[]>('/equipment');
-				return data.map((item) => ({
-					id: item.id,
-					name: item.name,
-					description: item.description,
-					categoryLabel: `Bodega ${item.warehouse_id}`,
-					originalData: item,
-				}));
+				return data.map(
+					(item: Equipment): CatalogItem => ({
+						id: item.id,
+						name: item.name,
+						description: item.description,
+						categoryLabel: `Bodega ${item.warehouse_id}`,
+						originalData: item as unknown as Record<
+							string,
+							unknown
+						>,
+					}),
+				);
 			}
 			case 'mantenimiento': {
 				const data =
 					await apiClient.get<MaintenanceType[]>(
 						'/maintenance-types',
 					);
-				return data.map((item) => ({
-					id: item.id,
-					name: item.name,
-					description: item.description,
-					categoryLabel: `Bodega ${item.warehouse_id}`,
-					originalData: item,
-				}));
+				return data.map(
+					(item: MaintenanceType): CatalogItem => ({
+						id: item.id,
+						name: item.name,
+						description: item.description,
+						categoryLabel: `Bodega ${item.warehouse_id}`,
+						originalData: item as unknown as Record<
+							string,
+							unknown
+						>,
+					}),
+				);
 			}
 			default:
 				return [];
@@ -63,7 +78,10 @@ export const catalogService = {
 		await apiClient.delete(`${endpoint}/${id}`);
 	},
 
-	async createItem(type: CatalogType, data: CatalogFormData): Promise<unknown> {
+	async createItem(
+		type: CatalogType,
+		data: CatalogFormData,
+	): Promise<unknown> {
 		const endpoint =
 			type === 'gasto'
 				? '/expense-types'

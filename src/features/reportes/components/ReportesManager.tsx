@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TRANSACTIONS, BAR_DATA } from '@/features/reportes/types';
+import { TRANSACTIONS, BAR_DATA, BarEntry, Transaction } from '@/features/reportes/types';
 import { formatCurrency } from '@/lib/utils';
 import TrendingUp from '@/assets/icons/trending_up.svg';
 import TrendingDown from '@/assets/icons/trending_down.svg';
@@ -23,16 +23,9 @@ interface ReportData {
 		netProfit: number;
 		profitMargin: number;
 	};
-	barData: Array<[string, string, boolean, number]>;
+	barData: BarEntry[];
 	distribution: Array<{ label: string; pct: string; dot: string }>;
-	lastMovements: Array<{
-		id: string;
-		icon: string;
-		concept: string;
-		category: string;
-		time: string;
-		amount: number;
-	}>;
+	lastMovements: Transaction[];
 }
 
 export function ReportesManager() {
@@ -179,7 +172,7 @@ export function ReportesManager() {
 						{/* Bar Chart */}
 						<div className='h-64 flex items-end justify-between gap-2 px-4 border-b border-[var(--color-outline-variant)] pb-2'>
 							{(data?.barData || BAR_DATA).map(
-								([label, height, active, rawValue]: [string, string, boolean, number]) => (
+								([label, height, active, rawValue]: BarEntry) => (
 									<div
 										key={label}
 										className='flex flex-col items-center flex-1 gap-2'>
@@ -314,7 +307,7 @@ export function ReportesManager() {
 							</thead>
 							<tbody className='divide-y divide-[var(--color-outline-variant)]'>
 								{(data?.lastMovements || TRANSACTIONS).map(
-									(tx: { id: string; icon: string; concept: string; category: string; time: string; amount: number }) => (
+									(tx: Transaction) => (
 										<tr
 											key={tx.id}
 											className='hover:bg-[var(--color-surface-container-low)] transition-colors'>
