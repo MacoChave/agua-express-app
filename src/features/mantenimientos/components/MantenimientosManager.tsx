@@ -20,12 +20,23 @@ import DatePicker, {
 import { formatToAPIDate, formatDate } from '@/lib/utils';
 import { Modal } from '@/components/ui';
 
+export interface MaintenanceTaskData {
+	date: string;
+	evidence?: string;
+	notes?: string;
+	serial_number: string;
+	equipment_id: number;
+	maintenance_type_id: number;
+	equipment?: { name: string };
+	maintenance_types?: { name: string };
+}
+
 export function MantenimientosManager() {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [scheduleOpen, setScheduleOpen] = useState(false);
-	const [tasks, setTasks] = useState<any[]>([]);
+	const [tasks, setTasks] = useState<MaintenanceTaskData[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [lastBackwash, setLastBackwash] = useState<any>(null);
+	const [lastBackwash, setLastBackwash] = useState<{ date: string } | null>(null);
 	const [dateRange, setDateRange] = useState(() => {
 		const today = new Date();
 		const day = today.getDay();
@@ -62,7 +73,7 @@ export function MantenimientosManager() {
 		async function fetchTasks() {
 			try {
 				setLoading(true);
-				const data = await apiClient.get<any[]>(
+				const data = await apiClient.get<MaintenanceTaskData[]>(
 					`/maintenance-tasks?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
 				);
 				setTasks(data);
@@ -74,7 +85,7 @@ export function MantenimientosManager() {
 		}
 		async function fetchLastBackwash() {
 			try {
-				const data = await apiClient.get<any>('/maintenance-tasks/last-backwash');
+				const data = await apiClient.get<{ date: string }>('/maintenance-tasks/last-backwash');
 				setLastBackwash(data);
 			} catch (error) {
 				console.error('Error fetching last backwash:', error);
@@ -191,8 +202,8 @@ export function MantenimientosManager() {
 											if (!Array.isArray(e)) return;
 
 											const [start, end] = e;
-											let startDate = toDateString(start);
-											let endDate = toDateString(end);
+											const startDate = toDateString(start);
+											const endDate = toDateString(end);
 
 											if (startDate && endDate)
 												setDateRange({

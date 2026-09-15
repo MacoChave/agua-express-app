@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { apiClient } from '@/lib/apiClient';
+import { Equipment, MaintenanceType } from '@/types/database';
 
 import Close from '@/assets/icons/close.svg';
 import AddAPhoto from '@/assets/icons/add_a_photo.svg';
@@ -38,8 +39,8 @@ export interface NewMaintenanceModalProps {
 }
 
 export function NewMaintenanceModal({ onClose }: NewMaintenanceModalProps) {
-	const [equipments, setEquipments] = useState<any[]>([]);
-	const [maintenanceTypes, setMaintenanceTypes] = useState<any[]>([]);
+	const [equipments, setEquipments] = useState<Equipment[]>([]);
+	const [maintenanceTypes, setMaintenanceTypes] = useState<MaintenanceType[]>([]);
 	const [loadingData, setLoadingData] = useState(true);
 
 	const [equipment, setEquipment] = useState('');
@@ -57,8 +58,8 @@ export function NewMaintenanceModal({ onClose }: NewMaintenanceModalProps) {
 		async function fetchData() {
 			try {
 				const [eqRes, typeRes] = await Promise.all([
-					apiClient.get<any[]>('/equipment'),
-					apiClient.get<any[]>('/maintenance-types'),
+					apiClient.get<Equipment[]>('/equipment'),
+					apiClient.get<MaintenanceType[]>('/maintenance-types'),
 				]);
 				setEquipments(eqRes);
 				setMaintenanceTypes(typeRes);
@@ -237,6 +238,7 @@ export function NewMaintenanceModal({ onClose }: NewMaintenanceModalProps) {
 
 				{evidencePreview ? (
 					<div className='relative rounded-xl overflow-hidden border-2 border-[var(--color-outline-variant)]'>
+						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
 							src={evidencePreview}
 							alt='Evidencia'

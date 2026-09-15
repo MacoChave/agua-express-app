@@ -41,7 +41,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 				type: 'success',
 			});
 			onConfirm();
-		} catch (error) {
+		} catch {
 			toast({
 				title: 'Error',
 				message:
@@ -82,7 +82,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 						type='number'
 						value={cantidad === 0 ? '' : cantidad}
 						onChange={(e) => {
-							let val = parseInt(e.target.value);
+							const val = parseInt(e.target.value);
 							if (!isNaN(val) && val > 0) setCantidad(val);
 							else setCantidad(0);
 						}}
@@ -110,7 +110,7 @@ export default function VentaForm({ onConfirm }: VentaFormProps) {
 						type='number'
 						value={total === 0 ? '' : total}
 						onChange={(e) => {
-							let val = parseInt(e.target.value);
+							const val = parseInt(e.target.value);
 							if (!isNaN(val) && val > 0) setTotal(val);
 							else setTotal(0);
 						}}

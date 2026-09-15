@@ -14,22 +14,40 @@ import ArrowUpward from '@/assets/icons/arrow_upward.svg';
 import ArrowDownward from '@/assets/icons/arrow_downward.svg';
 import Download from '@/assets/icons/download.svg';
 
+interface ReportData {
+	daily: {
+		income: number;
+		incomeIncrease: number;
+		expense: number;
+		expenseIncrease: number;
+		netProfit: number;
+		profitMargin: number;
+	};
+	barData: Array<[string, string, boolean, number]>;
+	distribution: Array<{ label: string; pct: string; dot: string }>;
+	lastMovements: Array<{
+		id: string;
+		icon: string;
+		concept: string;
+		category: string;
+		time: string;
+		amount: number;
+	}>;
+}
+
 export function ReportesManager() {
 	const [closingDay, setClosingDay] = useState(false);
 	const [closed, setClosed] = useState(false);
-	const [data, setData] = useState<any>(null);
-	const [loading, setLoading] = useState(true);
+	const [data, setData] = useState<ReportData | null>(null);
 
 	useEffect(() => {
 		fetch('/api/reportes/dashboard')
 			.then((res) => res.json())
 			.then((json) => {
 				setData(json);
-				setLoading(false);
 			})
 			.catch((err) => {
 				console.error(err);
-				setLoading(false);
 			});
 	}, []);
 
@@ -161,7 +179,7 @@ export function ReportesManager() {
 						{/* Bar Chart */}
 						<div className='h-64 flex items-end justify-between gap-2 px-4 border-b border-[var(--color-outline-variant)] pb-2'>
 							{(data?.barData || BAR_DATA).map(
-								([label, height, active, rawValue]: any) => (
+								([label, height, active, rawValue]: [string, string, boolean, number]) => (
 									<div
 										key={label}
 										className='flex flex-col items-center flex-1 gap-2'>
@@ -214,7 +232,7 @@ export function ReportesManager() {
 											dot: 'bg-[var(--color-surface-variant)]',
 										},
 									]
-								).map(({ label, pct, dot }: any) => (
+								).map(({ label, pct, dot }: { label: string; pct: string; dot: string }) => (
 									<li
 										key={label}
 										className='flex items-center justify-between'>
@@ -296,7 +314,7 @@ export function ReportesManager() {
 							</thead>
 							<tbody className='divide-y divide-[var(--color-outline-variant)]'>
 								{(data?.lastMovements || TRANSACTIONS).map(
-									(tx: any) => (
+									(tx: { id: string; icon: string; concept: string; category: string; time: string; amount: number }) => (
 										<tr
 											key={tx.id}
 											className='hover:bg-[var(--color-surface-container-low)] transition-colors'>

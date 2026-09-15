@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 		return NextResponse.json(null);
 	}
 
-	const typeIds = types.map((t) => t.id);
+	const typeIds = types.map((t: { id: number }) => t.id);
 
 	let query = supabase
 		.from('maintenance_tasks')
@@ -29,7 +29,10 @@ export async function GET(request: Request) {
 
 	// Get the most recent one in the past (already completed)
 	const today = new Date().toISOString().split('T')[0];
-	query = query.lte('date', today).order('date', { ascending: false }).limit(1);
+	query = query
+		.lte('date', today)
+		.order('date', { ascending: false })
+		.limit(1);
 
 	const { data, error } = await query.single();
 

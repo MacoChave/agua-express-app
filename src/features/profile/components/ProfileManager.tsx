@@ -57,11 +57,11 @@ export function ProfileManager() {
 				type: 'success',
 				message: 'Tu perfil ha sido actualizado correctamente.',
 			});
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setUpdateLoading(false);
@@ -105,11 +105,11 @@ export function ProfileManager() {
 				message: 'Tu contraseña ha sido actualizada correctamente.',
 			});
 			(e.target as HTMLFormElement).reset();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setLoading(false);
@@ -137,7 +137,7 @@ export function ProfileManager() {
 							label='Nombre'
 							placeholder='Tu nombre'
 							value={firstName}
-							onChange={(e: any) => setFirstName(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
 							required
 						/>
 						<InputField
@@ -147,7 +147,7 @@ export function ProfileManager() {
 							label='Apellido'
 							placeholder='Tu apellido'
 							value={lastName}
-							onChange={(e: any) => setLastName(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
 							required
 						/>
 					</div>
@@ -158,7 +158,7 @@ export function ProfileManager() {
 						label='Correo electrónico'
 						placeholder='tu@email.com'
 						value={email}
-						onChange={(e: any) => setEmail(e.target.value)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
 						required
 					/>
 					<div className='pt-4'>

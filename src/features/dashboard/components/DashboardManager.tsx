@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card } from '@/components/ui';
+import { Card } from '@/components/ui';
 import { createClient } from '@/lib/supabase/client';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import OrderApprove from '@/assets/icons/order_approve.svg';
-import Build from '@/assets/icons/build.svg';
 import Event from '@/assets/icons/event.svg';
 import AccountBalanceWallet from '@/assets/icons/account_balance_wallet.svg';
 import TrendingUp from '@/assets/icons/trending_up.svg';
@@ -35,13 +33,36 @@ function Progress({
 	);
 }
 
+interface SystemHealth {
+	label: string;
+	value: string;
+	tone?: string;
+}
+
+interface DashboardData {
+	error?: string;
+	daily: {
+		income: number;
+		incomeIncrease: number;
+	};
+	weekly: {
+		currentIncome: number;
+		increase: number;
+	};
+	maintenance?: {
+		equipmentName: string;
+		date: string;
+	};
+	systemHealth?: SystemHealth[];
+}
+
 export function DashboardManager() {
 	const { toast } = useToast();
-	const [dashboardData, setDashboardData] = useState<any>(null);
+	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 	const router = useRouter();
 
 	const [isAdmin, setIsAdmin] = useState(false);
-	const [warehouses, setWarehouses] = useState<any[]>([]);
+	const [warehouses, setWarehouses] = useState<Array<{ id: string; name: string }>>([]);
 	const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>('');
 
 	useEffect(() => {
@@ -49,6 +70,7 @@ export function DashboardManager() {
 			/(^| )selected_warehouse_id=([^;]+)/,
 		);
 		if (match) {
+			// eslint-disable-next-line
 			setSelectedWarehouseId(match[2]);
 		}
 
@@ -63,11 +85,11 @@ export function DashboardManager() {
 					.select('role, warehouse_id')
 					.eq('id', user.id)
 					.single();
-				if ((profile as any)?.role === 'admin') {
+				if ((profile as { role?: string; warehouse_id?: string | number })?.role === 'admin') {
 					setIsAdmin(true);
-					if (!match && (profile as any)?.warehouse_id) {
+					if (!match && (profile as { warehouse_id?: string | number })?.warehouse_id) {
 						setSelectedWarehouseId(
-							String((profile as any).warehouse_id),
+							String((profile as { warehouse_id?: string | number }).warehouse_id),
 						);
 					}
 					fetch('/api/warehouses')
@@ -103,7 +125,7 @@ export function DashboardManager() {
 					setDashboardData(data);
 				}
 			})
-			.catch((err) =>
+			.catch(() =>
 				toast({
 					title: 'Error al cargar datos',
 					message:
@@ -111,7 +133,7 @@ export function DashboardManager() {
 					type: 'error',
 				}),
 			);
-	}, [router]);
+	}, [router, toast]);
 
 	return (
 		<div>
@@ -304,7 +326,7 @@ export function DashboardManager() {
 								<div className='space-y-4'>
 									{dashboardData?.systemHealth ? (
 										dashboardData.systemHealth.map(
-											(health: any, i: number) => (
+											(health: SystemHealth, i: number) => (
 												<Progress
 													key={i}
 													label={health.label}

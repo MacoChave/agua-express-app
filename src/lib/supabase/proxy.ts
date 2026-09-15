@@ -16,7 +16,7 @@ export async function updateSession(request: NextRequest) {
 					return request.cookies.getAll();
 				},
 				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value, options }) =>
+					cookiesToSet.forEach(({ name, value }) =>
 						request.cookies.set(name, value),
 					);
 					supabaseResponse = NextResponse.next({
@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
 		// Call a SECURITY DEFINER function to bypass RLS issues in the Edge runtime
 		const { data, error } = await supabase.rpc('get_profile_by_id', {
 			user_id: user.id,
-		} as any);
+		} as never);
 
 		console.log({ userId: user.id, data, error });
 
@@ -56,7 +56,7 @@ export async function updateSession(request: NextRequest) {
 		if (data) {
 			const requestHeaders = new Headers(request.headers);
 
-			const proxyData = data as any;
+			const proxyData = data as { company_id?: string | number, role?: string, warehouse_id?: string | number };
 			if (proxyData.company_id) {
 				requestHeaders.set('x-company-id', proxyData.company_id.toString());
 			}

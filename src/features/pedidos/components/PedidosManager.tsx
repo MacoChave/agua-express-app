@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { Button, Card, StatusChip } from '@/components/ui';
 import { apiClient } from '@/lib/apiClient';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -15,9 +14,18 @@ import { AnadirPedidoManager } from '@/features/pedidos/components/AnadirPedidoM
 
 const PAGE_SIZE = 10;
 
+export interface InventoryMovement {
+	move_type: 'VENTA' | 'COMPRA';
+	quantity?: number | string;
+	price?: number | string;
+	expense_type_id?: string | number;
+	notes?: string;
+	move_date: string;
+}
+
 export function PedidosManager() {
 	const [showAdd, setShowAdd] = useState(false);
-	const [movements, setMovements] = useState<any[]>([]);
+	const [movements, setMovements] = useState<InventoryMovement[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [pagina, setPagina] = useState(1);
 	const [dateRange, setDateRange] = useState(() => {
@@ -38,7 +46,7 @@ export function PedidosManager() {
 		async function fetchMovements() {
 			try {
 				setLoading(true);
-				const data = await apiClient.get<any[]>(
+				const data = await apiClient.get<InventoryMovement[]>(
 					`/inventory-movements?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
 				);
 				setMovements(data);

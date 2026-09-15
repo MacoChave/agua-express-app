@@ -52,11 +52,11 @@ export function BranchForm({ editingBranch, onClose, onSuccess }: BranchFormProp
 			});
             onSuccess();
 			onClose();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setIsSaving(false);

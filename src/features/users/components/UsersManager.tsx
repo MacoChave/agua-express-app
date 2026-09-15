@@ -154,11 +154,11 @@ export function UsersManager() {
 			const data = await res.json();
 			setUsers(data.users || []);
 			setTotalPages(Math.ceil((data.count || 0) / limit));
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setLoading(false);
@@ -166,7 +166,9 @@ export function UsersManager() {
 	};
 
 	useEffect(() => {
+		// eslint-disable-next-line
 		fetchUsers();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page, searchQuery]);
 
 	const handleAddOrUpdateUser = async (
@@ -218,11 +220,11 @@ export function UsersManager() {
 				message: 'Usuario guardado correctamente',
 			});
 			fetchUsers();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setIsSaving(false);
@@ -248,11 +250,11 @@ export function UsersManager() {
 				message: 'Estado del usuario actualizado correctamente',
 			});
 			fetchUsers();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		}
 	};
@@ -310,7 +312,7 @@ export function UsersManager() {
 							name='search'
 							placeholder='Buscar por nombre...'
 							value={searchTerm}
-							onChange={(e: any) => setSearchTerm(e.target.value)}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
 							prefixIcon={<Search className='w-5 h-5' />}
 						/>
 					</div>

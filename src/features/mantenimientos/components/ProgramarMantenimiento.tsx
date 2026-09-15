@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Button, InputField } from '@/components/ui';
 import { apiClient } from '@/lib/apiClient';
+import { Equipment, MaintenanceType } from '@/types/database';
 import Event from '@/assets/icons/event.svg';
 import Build from '@/assets/icons/build.svg';
 import KeyboardArrowDown from '@/assets/icons/keyboard_arrow_down.svg';
@@ -21,8 +22,8 @@ export interface ProgramarMantenimientoProps {
 export function ProgramarMantenimiento({
 	onClose,
 }: ProgramarMantenimientoProps) {
-	const [equipments, setEquipments] = useState<any[]>([]);
-	const [maintenanceTypes, setMaintenanceTypes] = useState<any[]>([]);
+	const [equipments, setEquipments] = useState<Equipment[]>([]);
+	const [maintenanceTypes, setMaintenanceTypes] = useState<MaintenanceType[]>([]);
 	const [loadingData, setLoadingData] = useState(true);
 
 	const [form, setForm] = useState({
@@ -38,8 +39,8 @@ export function ProgramarMantenimiento({
 		async function fetchData() {
 			try {
 				const [eqRes, typeRes] = await Promise.all([
-					apiClient.get<any[]>('/equipment'),
-					apiClient.get<any[]>('/maintenance-types'),
+					apiClient.get<Equipment[]>('/equipment'),
+					apiClient.get<MaintenanceType[]>('/maintenance-types'),
 				]);
 				setEquipments(eqRes);
 				setMaintenanceTypes(typeRes);

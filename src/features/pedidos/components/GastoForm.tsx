@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/apiClient';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ui/Toast/ToastContext';
 import DatePicker, { DatePickerValue } from '@/components/ui/DatePicker/DatePicker';
+import { ExpenseType } from '@/types/database';
 
 interface GastoFormProps {
 	onConfirm: () => void;
@@ -20,16 +21,16 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 	const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
 	const [archivo, setArchivo] = useState<File | null>(null);
 	const [loading, setLoading] = useState(false);
-	const [expenseTypes, setExpenseTypes] = useState<any[]>([]);
+	const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
 	const [loadingTypes, setLoadingTypes] = useState(true);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		async function fetchExpenseTypes() {
 			try {
-				const data = await apiClient.get<any[]>('/expense-types');
+				const data = await apiClient.get<ExpenseType[]>('/expense-types');
 				setExpenseTypes(data);
-			} catch (error) {
+			} catch {
 				toast({
 					title: 'Error',
 					message: 'No se pudieron cargar los tipos de gasto.',
@@ -40,7 +41,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 			}
 		}
 		fetchExpenseTypes();
-	}, []);
+	}, [toast]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -117,7 +118,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 				type: 'success',
 			});
 			onConfirm();
-		} catch (error) {
+		} catch {
 			toast({
 				title: 'Error',
 				message:
@@ -202,7 +203,7 @@ export default function GastoForm({ onConfirm }: GastoFormProps) {
 						placeholder='200'
 						value={monto === 0 ? '' : monto}
 						onChange={(e) => {
-							let value = parseFloat(e.target.value);
+							const value = parseFloat(e.target.value);
 							if (!isNaN(value)) setMonto(value);
 							else setMonto(0);
 						}}

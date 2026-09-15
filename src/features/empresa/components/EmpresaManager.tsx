@@ -35,7 +35,6 @@ export function EmpresaManager() {
 
 	const [showBranchModal, setShowBranchModal] = useState(false);
 	const [editingBranch, setEditingBranch] = useState<Warehouse | null>(null);
-	const [isSavingBranch, setIsSavingBranch] = useState(false);
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -53,11 +52,11 @@ export function EmpresaManager() {
 
 			setCompany(companyData);
 			setWarehouses(warehouseData || []);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setLoading(false);
@@ -65,7 +64,9 @@ export function EmpresaManager() {
 	};
 
 	useEffect(() => {
+		// eslint-disable-next-line
 		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSaveCompany = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -92,11 +93,11 @@ export function EmpresaManager() {
 				message: 'Datos de la empresa guardados correctamente',
 			});
 			fetchData();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		} finally {
 			setIsSavingCompany(false);
@@ -122,11 +123,11 @@ export function EmpresaManager() {
 				message: 'Estado de la sucursal actualizado correctamente',
 			});
 			fetchData();
-		} catch (err: any) {
+		} catch (err: unknown) {
 			toast({
 				title: 'Error',
 				type: 'error',
-				message: err.message,
+				message: err instanceof Error ? err.message : 'Error desconocido',
 			});
 		}
 	};

@@ -22,6 +22,11 @@ export const Toast = ({
 	const [isVisible, setIsVisible] = useState(false);
 	const [isLeaving, setIsLeaving] = useState(false);
 
+	const handleClose = React.useCallback(() => {
+		setIsLeaving(true);
+		setTimeout(onRemove, 300); // match transition duration
+	}, [onRemove]);
+
 	useEffect(() => {
 		// Trigger enter animation
 		requestAnimationFrame(() => {
@@ -36,12 +41,7 @@ export const Toast = ({
 			}, duration);
 			return () => clearTimeout(timer);
 		}
-	}, [duration]);
-
-	const handleClose = () => {
-		setIsLeaving(true);
-		setTimeout(onRemove, 300); // match transition duration
-	};
+	}, [duration, handleClose]);
 
 	const typeStyles = {
 		success: 'bg-[#f0fdf4] border-[#bbf7d0] text-[#166534]',
@@ -57,7 +57,7 @@ export const Toast = ({
 		info: 'text-[#3b82f6]',
 	};
 
-	const Icon = () => {
+	const renderIcon = () => {
 		switch (type) {
 			case 'success':
 				return (
@@ -132,7 +132,7 @@ export const Toast = ({
 			} ${typeStyles[type]}`}
 			role='alert'>
 			<div className='flex-shrink-0'>
-				<Icon />
+				{renderIcon()}
 			</div>
 			<div className='ml-3 w-0 flex-1'>
 				{title && <p className='text-sm font-bold mb-0.5'>{title}</p>}

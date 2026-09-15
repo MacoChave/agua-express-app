@@ -151,6 +151,7 @@ const CalendarPanel: React.FC<DatePickerProps> = ({
 		if (selectionType === 'single') {
 			if (value && !Array.isArray(value)) {
 				const d = safeParse(value, mode);
+				// eslint-disable-next-line
 				setDraftStart(d);
 				if (d) setCurrentMonth(d.startOf('month'));
 			} else {
@@ -578,7 +579,7 @@ const DatePicker: React.FC<DatePickerProps> = (props) => {
 		const formatStr =
 			props.mode === 'datetime' ? 'DD/MM/YYYY HH:mm' : 'DD/MM/YYYY';
 
-		const formatVal = (val: any) => {
+		const formatVal = (val: Date | string | null) => {
 			if (!val) return '';
 			let d = dayjs(val);
 			if (props.mode === 'date') {

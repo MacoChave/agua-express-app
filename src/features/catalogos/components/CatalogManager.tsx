@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CatalogType, CATALOG_METADATA, CatalogItem } from '../types';
+import { CatalogType, CATALOG_METADATA, CatalogItem, CatalogFormData } from '../types';
 import { catalogService } from '../services/catalogService';
 import { CatalogForm } from './CatalogForm';
 import { CatalogModal } from './CatalogModal';
@@ -18,6 +18,7 @@ export function CatalogManager() {
 
 	useEffect(() => {
 		loadItems();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeTab]);
 
 	async function loadItems() {
@@ -53,7 +54,7 @@ export function CatalogManager() {
 		}
 	};
 
-	const handleSubmit = async (formData: any) => {
+	const handleSubmit = async (formData: CatalogFormData) => {
 		try {
 			if (editingItem) {
 				await catalogService.updateItem(

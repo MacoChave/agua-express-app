@@ -108,7 +108,23 @@ const InputField = forwardRef<
 		.filter(Boolean)
 		.join(' ');
 
+	// Extract values safely for hooks
+	const initialValue = (props as any).value;
+	const initialDefaultValue = (props as any).defaultValue;
+
+	const internalRef = useRef<HTMLInputElement>(null);
+	const [showPassword, setShowPassword] = useState(false);
+	const [hasValue, setHasValue] = useState(Boolean(initialValue || initialDefaultValue));
+
+	useEffect(() => {
+		if (initialValue !== undefined) {
+			// eslint-disable-next-line
+			setHasValue(String(initialValue).length > 0);
+		}
+	}, [initialValue]);
+
 	if (props.as === 'textarea') {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const {
 			as: _as,
 			prefixIcon: _l,
@@ -162,6 +178,7 @@ const InputField = forwardRef<
 		);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const {
 		as: _as,
 		label: _lb,
@@ -180,18 +197,8 @@ const InputField = forwardRef<
 		...rest
 	} = props as InputFieldProps;
 
-	const internalRef = useRef<HTMLInputElement>(null);
-	const [showPassword, setShowPassword] = useState(false);
-	const [hasValue, setHasValue] = useState(Boolean(value || defaultValue));
-
 	const isPassword = type === 'password';
 	const isText = type === 'text';
-
-	useEffect(() => {
-		if (value !== undefined) {
-			setHasValue(String(value).length > 0);
-		}
-	}, [value]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setHasValue(e.target.value.length > 0);
