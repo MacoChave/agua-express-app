@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { Button, InputField } from '@/components/ui';
 import { catalogService } from '../services/catalogService';
 import { Warehouse } from '@/types/database';
+import { CatalogFormData } from '../types';
 
 interface CatalogFormProps {
-	initialData?: any;
-	onSubmit: (data: any) => Promise<void>;
+	initialData?: Partial<CatalogFormData>;
+	onSubmit: (data: CatalogFormData) => Promise<void>;
 	onCancel: () => void;
 	entityName: string;
 	isEditing?: boolean;
@@ -39,6 +40,7 @@ export function CatalogForm({
 			}
 		}
 		loadWarehouses();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSubmit = async (e: React.FormEvent) => {

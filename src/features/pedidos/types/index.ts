@@ -1,4 +1,4 @@
-import type { StatusVariant } from '@/components/ui/StatusChip';
+import type { StatusVariant } from '@/components/ui/StatusChip/StatusChip';
 
 /* ── Dominio ─────────────────────────────────────────────── */
 export type EstadoPedido = 'en-camino' | 'entregado' | 'pendiente';

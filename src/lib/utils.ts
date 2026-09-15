@@ -27,15 +27,16 @@ export function formatCurrency(amount: number): string {
 		style: 'currency',
 		currency: 'GTQ',
 		minimumFractionDigits: 2,
-	}).format(Math.abs(amount));
+	}).format(amount);
 }
 
 /** Formatea fecha en GTQ (es-GT) */
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
 	return new Intl.DateTimeFormat('es-GT', {
 		year: 'numeric',
 		month: '2-digit',
 		day: '2-digit',
+		...options,
 	}).format(new Date(date));
 }
 

@@ -5,24 +5,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 import WaterDrop from '@/assets/icons/water_drop.svg';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export default function ResetPasswordPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState(false);
+	const { toast } = useToast();
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
-		setError(null);
 
 		const formData = new FormData(e.currentTarget);
 		const password = formData.get('password');
 		const confirmPassword = formData.get('confirmPassword');
 
 		if (password !== confirmPassword) {
-			setError('Las contraseñas no coinciden');
+			toast({
+				title: 'Error',
+				message: 'Las contraseñas no coinciden',
+				type: 'error',
+			});
 			setLoading(false);
 			return;
 		}
@@ -42,12 +45,18 @@ export default function ResetPasswordPage() {
 				);
 			}
 
-			setSuccess(true);
-			setTimeout(() => {
-				router.push('/login');
-			}, 3000);
+			toast({
+				title: 'Éxito',
+				message:
+					'Contraseña actualizada con éxito. Serás redirigido al login en unos segundos.',
+				type: 'success',
+			});
 		} catch (err: any) {
-			setError(err.message);
+			toast({
+				title: 'Error',
+				message: err.message,
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -98,44 +107,31 @@ export default function ResetPasswordPage() {
 				</div>
 
 				<div className='px-8 py-8'>
-					{error && (
-						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
-							{error}
-						</div>
-					)}
-					{success && (
-						<div className='mb-6 p-4 rounded-lg bg-primary-container text-on-primary-container text-body-sm'>
-							Contraseña actualizada con éxito. Serás redirigido
-							al login en unos segundos.
-						</div>
-					)}
-					{!success && (
-						<form className='space-y-5' onSubmit={handleSubmit}>
-							<InputField
-								id='password'
-								name='password'
-								type='password'
-								label='Nueva contraseña'
-								placeholder='Mínimo 8 caracteres'
-								required
-							/>
+					<form className='space-y-5' onSubmit={handleSubmit}>
+						<InputField
+							id='password'
+							name='password'
+							type='password'
+							label='Nueva contraseña'
+							placeholder='Mínimo 8 caracteres'
+							required
+						/>
 
-							<InputField
-								id='confirmPassword'
-								name='confirmPassword'
-								type='password'
-								label='Confirmar nueva contraseña'
-								placeholder='Repite tu nueva contraseña'
-								required
-							/>
+						<InputField
+							id='confirmPassword'
+							name='confirmPassword'
+							type='password'
+							label='Confirmar nueva contraseña'
+							placeholder='Repite tu nueva contraseña'
+							required
+						/>
 
-							<Button type='submit' fullWidth loading={loading}>
-								{loading
-									? 'Actualizando...'
-									: 'Actualizar contraseña'}
-							</Button>
-						</form>
-					)}
+						<Button type='submit' fullWidth loading={loading}>
+							{loading
+								? 'Actualizando...'
+								: 'Actualizar contraseña'}
+						</Button>
+					</form>
 				</div>
 			</Card>
 		</main>

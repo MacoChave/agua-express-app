@@ -5,16 +5,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, Card, InputField, StatusChip } from '@/components/ui';
 import WaterDrop from '@/assets/icons/water_drop.svg';
+import { useToast } from '@/components/ui/Toast/ToastContext';
 
 export default function RegisterPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const { toast } = useToast();
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setLoading(true);
-		setError(null);
 
 		const formData = new FormData(e.currentTarget);
 		const firstName = formData.get('firstName');
@@ -27,7 +27,11 @@ export default function RegisterPage() {
 		const confirmPassword = formData.get('confirmPassword');
 
 		if (password !== confirmPassword) {
-			setError('Las contraseñas no coinciden');
+			toast({
+				title: 'Error',
+				message: 'Las contraseñas no coinciden',
+				type: 'error',
+			});
 			setLoading(false);
 			return;
 		}
@@ -67,7 +71,11 @@ export default function RegisterPage() {
 			router.push('/dashboard');
 			router.refresh();
 		} catch (err: any) {
-			setError(err.message);
+			toast({
+				title: 'Error',
+				message: err.message,
+				type: 'error',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -119,11 +127,6 @@ export default function RegisterPage() {
 				</div>
 
 				<div className='px-8 py-8'>
-					{error && (
-						<div className='mb-6 p-4 rounded-lg bg-error-container text-on-error-container text-body-sm'>
-							{error}
-						</div>
-					)}
 					<form className='space-y-5' onSubmit={handleSubmit}>
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 							<InputField

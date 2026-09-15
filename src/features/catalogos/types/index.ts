@@ -1,13 +1,19 @@
-import { Equipment, ExpenseType, MaintenanceType } from '@/types/database';
-
 export type CatalogType = 'gasto' | 'equipos' | 'mantenimiento';
+
+export interface CatalogFormData {
+	name: string;
+	description?: string;
+	warehouse_id?: number | string;
+	company_id?: number;
+	expense_type?: string;
+}
 
 export interface CatalogItem {
 	id: string | number;
 	name: string;
 	description?: string;
 	categoryLabel?: string; // e.g., Warehouse name or code
-	originalData: any;
+	originalData: Record<string, unknown>;
 }
 
 export interface CatalogMetadata {
